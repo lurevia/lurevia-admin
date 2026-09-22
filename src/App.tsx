@@ -52,6 +52,7 @@ export const App = () => (
     theme={lureviaAdminTheme}
     layout={LureviaLayout}
     dashboard={Dashboard}
+    basename="/lurevia-admin"
     requireAuth
     disableTelemetry
   >

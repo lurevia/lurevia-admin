@@ -37,8 +37,14 @@ export const Dashboard = () => {
   }, []);
 
   return (
-    <div>
+    <div style={{ maxWidth: 1440, margin: "0 auto" }}>
       <Title title="Tableau de bord" />
+      <Typography variant="overline" sx={{ color: "primary.light", letterSpacing: 2 }}>
+        VUE D'ENSEMBLE · LUREVIA
+      </Typography>
+      <Typography variant="h4" sx={{ fontWeight: 800, mb: 2.5 }}>
+        Bonjour, équipe Lurevia
+      </Typography>
       <Grid container spacing={2} sx={{ mt: 0.5 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
@@ -91,7 +97,7 @@ export const Dashboard = () => {
         </Grid>
       </Grid>
 
-      <Card sx={{ mt: 3 }}>
+      <Card sx={{ mt: 3, borderRadius: 4 }}>
         <CardContent>
           <Typography variant="h6" sx={{ mb: 1 }}>
             Activité récente
