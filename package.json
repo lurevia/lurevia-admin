@@ -9,21 +9,23 @@
     "copy:404": "node -e \"require('fs').copyFileSync('dist/index.html','dist/404.html')\"",
     "preview": "vite preview",
     "lint": "eslint .",
-    "deploy": "npm run build && gh-pages -d dist"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-admin": "^4.16.20",
-    "ra-language-french": "^4.16.20",
-    "ra-i18n-polyglot": "^4.16.20",
+    "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
-    "@mui/icons-material": "^5.16.7"
+    "ra-i18n-polyglot": "^4.16.20",
+    "ra-language-french": "^4.16.20",
+    "react": "^18.3.1",
+    "react-admin": "^4.16.20",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "gh-pages": "^6.3.0",
     "typescript": "^5.5.4",
     "vite": "^5.4.2"
   }
