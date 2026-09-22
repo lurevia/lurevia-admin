@@ -34,6 +34,7 @@ import { DeletionRequestList } from "./resources/deletionRequests/DeletionReques
 import { ProfileChangeList } from "./resources/profileChanges/ProfileChangeList";
 import { VerificationList } from "./resources/verifications/VerificationList";
 import { AdminMessagePage } from "./resources/messages/AdminMessagePage";
+import { LureviaLoginPage } from "./auth/LoginPage";
 
 // Interface 100% en français, y compris les textes intégrés de react-admin
 // (pagination, confirmations, messages d'erreur) — cohérent avec le reste
@@ -52,6 +53,7 @@ export const App = () => (
     theme={lureviaAdminTheme}
     layout={LureviaLayout}
     dashboard={Dashboard}
+    loginPage={LureviaLoginPage}
     basename="/lurevia-admin"
     requireAuth
     disableTelemetry
