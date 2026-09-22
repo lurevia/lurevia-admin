@@ -14,10 +14,10 @@ npm run dev             # http://localhost:5174
 
 Le workflow `Deploy admin to GitHub Pages` publie automatiquement `dist/` après
 chaque push sur `main` (ou manuellement depuis l'onglet Actions). Configurez
-`VITE_API_URL` comme variable d'environnement du workflow/repository avant le
-déploiement, et activez **GitHub Actions** comme source de publication dans
-les paramètres Pages. L'application utilise une base Vite racine (`/`) et
-doit donc être publiée sur un domaine dédié (ou un domaine personnalisé).
+`VITE_API_URL` comme variable du dépôt avant le déploiement, et sélectionnez
+**GitHub Actions** comme source de publication dans les paramètres Pages.
+L'application est configurée pour l'URL du projet :
+`https://lurevia.github.io/lurevia-admin/`.
 
 ## Côté API — à faire une fois
 
