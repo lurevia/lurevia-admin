@@ -1,75 +1,102 @@
 import { defaultTheme } from "react-admin";
 import type { RaThemeOptions } from "react-admin";
 
+/**
+ * Thème repensé pour ressembler à la boutique : clair, bleu, simple.
+ * On abandonne le thème sombre + glassmorphism (trop chargé, radius
+ * trop élevé) pour quelque chose de plat et net — cartes blanches à
+ * bord fin, coins peu arrondis, pas de flou.
+ */
 export const lureviaAdminTheme: RaThemeOptions = {
   ...defaultTheme,
   palette: {
-    mode: "dark",
-    primary: { main: "#4D8DFF", light: "#83B0FF", dark: "#2864D4" },
-    secondary: { main: "#8B5CF6" },
-    background: { default: "#07111F", paper: "#101D30" },
-    text: { primary: "#F4F7FF", secondary: "#94A7C4" },
+    mode: "light",
+    primary: { main: "#2F7BF6", light: "#5A93F9", dark: "#1749B0" },
+    secondary: { main: "#0A1B3D" },
+    background: { default: "#F4F7FC", paper: "#FFFFFF" },
+    text: { primary: "#0A1B3D", secondary: "#5B6B84" },
   },
   typography: {
     fontFamily: "system-ui, 'Segoe UI', Roboto, sans-serif",
     h6: { fontWeight: 700 },
   },
-  shape: { borderRadius: 14 },
+  shape: { borderRadius: 8 },
   components: {
     ...defaultTheme.components,
     MuiCssBaseline: {
       styleOverrides: {
-        body: {
-          backgroundColor: "#07111F",
-          backgroundImage:
-            "radial-gradient(44rem 28rem at 8% -10%, rgba(77, 141, 255, 0.24), transparent 60%)," +
-            "radial-gradient(38rem 26rem at 105% 8%, rgba(139, 92, 246, 0.18), transparent 58%)," +
-            "linear-gradient(180deg, #0A1728 0%, #07111F 100%)",
-          backgroundAttachment: "fixed",
-        },
+        body: { backgroundColor: "#F4F7FC" },
       },
     },
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundColor: "rgba(16, 29, 48, 0.88)",
-          border: "1px solid rgba(148, 167, 196, 0.14)",
-          boxShadow: "0 18px 48px -24px rgba(0, 0, 0, 0.8)",
+          backgroundColor: "#FFFFFF",
+          border: "1px solid #E4EAF4",
+          boxShadow: "0 1px 2px rgba(10, 27, 61, 0.04)",
+          backgroundImage: "none",
         },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: { borderRadius: 10 },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "rgba(7, 17, 31, 0.86)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          boxShadow: "0 4px 24px -4px rgba(10, 27, 61, 0.35)",
+          backgroundColor: "#FFFFFF",
+          color: "#0A1B3D",
+          borderBottom: "1px solid #E4EAF4",
+          boxShadow: "none",
         },
       },
     },
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: "rgba(9, 22, 38, 0.94)",
-          borderRight: "1px solid rgba(148, 167, 196, 0.14)",
+          backgroundColor: "#FFFFFF",
+          borderRight: "1px solid #E4EAF4",
         },
       },
     },
     MuiButton: {
       styleOverrides: {
+        root: { borderRadius: 8, textTransform: "none", fontWeight: 600 },
         containedPrimary: {
-          backgroundImage: "linear-gradient(to bottom, #5A93F9, #2F7BF6)",
-          boxShadow: "0 8px 20px -6px rgba(47, 123, 246, 0.55)",
+          backgroundColor: "#2F7BF6",
+          boxShadow: "none",
+          "&:hover": { backgroundColor: "#1749B0", boxShadow: "none" },
         },
       },
       defaultProps: { disableElevation: true },
+    },
+    MuiChip: {
+      styleOverrides: { root: { borderRadius: 6, fontWeight: 600 } },
+    },
+    MuiTextField: {
+      defaultProps: { size: "small" },
     },
     RaDatagrid: {
       styleOverrides: {
         root: {
           "& .RaDatagrid-headerCell": {
-            backgroundColor: "rgba(77, 141, 255, 0.1)",
+            backgroundColor: "#F4F7FC",
+            fontWeight: 700,
+            color: "#0A1B3D",
+          },
+          "& .RaDatagrid-row:hover": { backgroundColor: "#F4F7FC" },
+        },
+      },
+    },
+    RaMenuItemLink: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          "&.RaMenuItemLink-active": {
+            backgroundColor: "#EFF5FF",
+            color: "#1749B0",
             fontWeight: 700,
           },
         },

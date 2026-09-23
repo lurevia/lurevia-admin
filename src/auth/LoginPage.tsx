@@ -4,7 +4,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
-import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import {
   Alert,
@@ -20,6 +19,11 @@ import {
   Typography,
 } from "@mui/material";
 
+/**
+ * Page de connexion — simple et claire, assortie au reste de l'admin :
+ * fond uni, coins peu arrondis, pas de flou. Le panneau bleu à gauche
+ * garde une touche de marque sans en faire trop.
+ */
 export const LureviaLoginPage = () => {
   const login = useLogin();
   const notify = useNotify();
@@ -48,124 +52,84 @@ export const LureviaLoginPage = () => {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        px: { xs: 2, md: 5 },
-        py: { xs: 3, md: 5 },
-        background:
-          "radial-gradient(circle at 8% 10%, rgba(77,141,255,.24), transparent 32%)," +
-          "radial-gradient(circle at 92% 88%, rgba(139,92,246,.18), transparent 30%), #07111f",
-      }}
-    >
+    <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", px: { xs: 2, md: 5 }, py: 5, bgcolor: "#F4F7FC" }}>
       <Box
         sx={{
-          width: "min(1120px, 100%)",
+          width: "min(980px, 100%)",
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "1.08fr .92fr" },
+          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
           overflow: "hidden",
-          border: "1px solid rgba(148,167,196,.18)",
-          borderRadius: { xs: 4, md: 6 },
-          background: "rgba(12, 27, 46, .82)",
-          boxShadow: "0 32px 100px rgba(0,0,0,.42)",
-          backdropFilter: "blur(24px)",
+          border: "1px solid #E4EAF4",
+          borderRadius: 2,
+          bgcolor: "#fff",
+          boxShadow: "0 8px 32px -16px rgba(10, 27, 61, 0.18)",
         }}
       >
         <Box
           sx={{
-            position: "relative",
-            minHeight: { md: 650 },
-            p: { xs: 3, md: 6 },
-            display: "flex",
+            display: { xs: "none", md: "flex" },
             flexDirection: "column",
             justifyContent: "space-between",
-            overflow: "hidden",
-            background:
-              "linear-gradient(145deg, rgba(77,141,255,.22), rgba(12,27,46,.35) 52%, rgba(139,92,246,.17))",
+            p: 5,
+            background: "linear-gradient(160deg, #2F7BF6, #1749B0)",
+            color: "#fff",
           }}
         >
-          <Box sx={{ position: "relative", zIndex: 1 }}>
+          <Box>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Box
                 sx={{
-                  width: 44,
-                  height: 44,
+                  width: 36,
+                  height: 36,
                   display: "grid",
                   placeItems: "center",
-                  borderRadius: 3,
-                  color: "#fff",
-                  background: "linear-gradient(135deg, #4d8dff, #8b5cf6)",
-                  boxShadow: "0 12px 28px rgba(77,141,255,.34)",
+                  borderRadius: 1.5,
+                  bgcolor: "rgba(255,255,255,0.16)",
+                  fontWeight: 800,
                 }}
               >
-                <Inventory2OutlinedIcon />
+                L
               </Box>
-              <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800 }}>
                 Lurevia
               </Typography>
             </Stack>
-            <Typography
-              variant="overline"
-              sx={{ display: "block", mt: { xs: 7, md: 13 }, color: "primary.light", letterSpacing: 2.4 }}
-            >
+            <Typography variant="overline" sx={{ display: "block", mt: 8, opacity: 0.8, letterSpacing: 2 }}>
               ESPACE ÉQUIPE
             </Typography>
-            <Typography
-              component="h1"
-              sx={{
-                maxWidth: 510,
-                mt: 1,
-                fontSize: { xs: "2.5rem", md: "4.2rem" },
-                lineHeight: 0.98,
-                fontWeight: 850,
-                letterSpacing: "-.065em",
-              }}
-            >
+            <Typography component="h1" sx={{ maxWidth: 380, mt: 1, fontSize: "2.4rem", lineHeight: 1.15, fontWeight: 800 }}>
               Pilotez votre boutique avec clarté.
             </Typography>
-            <Typography sx={{ maxWidth: 440, mt: 3, color: "text.secondary", fontSize: "1.05rem", lineHeight: 1.7 }}>
+            <Typography sx={{ maxWidth: 360, mt: 2, opacity: 0.85, lineHeight: 1.6 }}>
               Un espace calme pour suivre vos ventes, vos produits et vos clients, sans bruit.
             </Typography>
           </Box>
 
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ position: "relative", zIndex: 1, mt: 6 }}>
-            <Paper sx={{ flex: 1, p: 2, background: "rgba(7,17,31,.48)" }}>
-              <TrendingUpIcon sx={{ color: "primary.light" }} />
-              <Typography sx={{ mt: 1, fontWeight: 700 }}>Vue d’ensemble</Typography>
-              <Typography variant="body2" color="text.secondary">Les bons signaux, au bon endroit.</Typography>
+          <Stack direction="row" spacing={1.5}>
+            <Paper sx={{ flex: 1, p: 2, bgcolor: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)" }}>
+              <TrendingUpIcon />
+              <Typography sx={{ mt: 1, fontWeight: 700 }}>Vue d'ensemble</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                Les bons signaux, au bon endroit.
+              </Typography>
             </Paper>
-            <Paper sx={{ flex: 1, p: 2, background: "rgba(7,17,31,.48)" }}>
-              <ShieldOutlinedIcon sx={{ color: "#a78bfa" }} />
+            <Paper sx={{ flex: 1, p: 2, bgcolor: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)" }}>
+              <ShieldOutlinedIcon />
               <Typography sx={{ mt: 1, fontWeight: 700 }}>Accès sécurisé</Typography>
-              <Typography variant="body2" color="text.secondary">Réservé aux administrateurs.</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                Réservé aux administrateurs.
+              </Typography>
             </Paper>
           </Stack>
-          <Box
-            sx={{
-              position: "absolute",
-              width: 260,
-              height: 260,
-              right: -80,
-              top: -80,
-              borderRadius: "50%",
-              border: "1px solid rgba(131,176,255,.18)",
-              boxShadow: "0 0 0 34px rgba(131,176,255,.04), 0 0 0 70px rgba(131,176,255,.025)",
-            }}
-          />
         </Box>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ p: { xs: 3, md: 6 }, display: "flex", alignItems: "center" }}>
-          <Stack spacing={3} sx={{ width: "100%" }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ p: { xs: 3, md: 5 }, display: "flex", alignItems: "center" }}>
+          <Stack spacing={2.5} sx={{ width: "100%" }}>
             <Box>
-              <Typography variant="overline" sx={{ color: "primary.light", letterSpacing: 2 }}>
-                BON RETOUR
-              </Typography>
-              <Typography component="h2" variant="h4" sx={{ mt: 0.5, fontWeight: 800, letterSpacing: -1 }}>
+              <Typography component="h2" variant="h5" sx={{ fontWeight: 800 }}>
                 Connexion
               </Typography>
-              <Typography color="text.secondary" sx={{ mt: 1 }}>
+              <Typography color="text.secondary" sx={{ mt: 0.5 }}>
                 Connectez-vous pour retrouver votre espace de pilotage.
               </Typography>
             </Box>
@@ -204,14 +168,7 @@ export const LureviaLoginPage = () => {
               control={<Checkbox checked={remember} onChange={(event) => setRemember(event.target.checked)} />}
               label="Rester connecté sur cet appareil"
             />
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              disabled={loading}
-              endIcon={<ArrowForwardIcon />}
-              sx={{ py: 1.5, borderRadius: 3, fontWeight: 800 }}
-            >
+            <Button type="submit" variant="contained" size="large" disabled={loading} endIcon={<ArrowForwardIcon />} sx={{ py: 1.3 }}>
               {loading ? "Connexion..." : "Ouvrir mon espace"}
             </Button>
             <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", lineHeight: 1.6 }}>

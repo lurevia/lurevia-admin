@@ -17,7 +17,7 @@ export const StatCard = ({ icon: Icon, label, value, hint, accent = "#2F7BF6" }:
       sx={{
         width: 48,
         height: 48,
-        borderRadius: "14px",
+        borderRadius: "10px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
