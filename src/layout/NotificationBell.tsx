@@ -6,7 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsIconModule from "@mui/icons-material/Notifications";
 import { useNavigate } from "react-router-dom";
 import {
   type AdminNotificationRecord,
@@ -15,6 +15,9 @@ import {
   markAllNotificationsRead,
   markNotificationRead,
 } from "../adminActions";
+import { normalizeMuiIcon } from "../muiIcon";
+
+const NotificationsIcon = normalizeMuiIcon(NotificationsIconModule);
 
 const POLL_INTERVAL_MS = 20000;
 

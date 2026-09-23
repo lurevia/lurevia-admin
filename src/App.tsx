@@ -1,15 +1,15 @@
 import { Admin, Resource, resolveBrowserLocale } from "react-admin";
 import polyglotI18nProvider from "ra-i18n-polyglot";
 import frenchMessages from "ra-language-french";
-import InventoryIcon from "@mui/icons-material/Inventory2";
-import CategoryIcon from "@mui/icons-material/Category";
-import ReceiptIcon from "@mui/icons-material/ReceiptLong";
-import PeopleIcon from "@mui/icons-material/People";
-import ReviewsIcon from "@mui/icons-material/RateReview";
-import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import FactCheckIcon from "@mui/icons-material/FactCheck";
-import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import InventoryIconModule from "@mui/icons-material/Inventory2";
+import CategoryIconModule from "@mui/icons-material/Category";
+import ReceiptIconModule from "@mui/icons-material/ReceiptLong";
+import PeopleIconModule from "@mui/icons-material/People";
+import ReviewsIconModule from "@mui/icons-material/RateReview";
+import PersonRemoveIconModule from "@mui/icons-material/PersonRemove";
+import FactCheckIconModule from "@mui/icons-material/FactCheck";
+import MarkEmailReadIconModule from "@mui/icons-material/MarkEmailRead";
+import ManageAccountsIconModule from "@mui/icons-material/ManageAccounts";
 import { CustomRoutes } from "react-admin";
 import { Route } from "react-router-dom";
 
@@ -35,6 +35,17 @@ import { ProfileChangeList } from "./resources/profileChanges/ProfileChangeList"
 import { VerificationList } from "./resources/verifications/VerificationList";
 import { AdminMessagePage } from "./resources/messages/AdminMessagePage";
 import { LureviaLoginPage } from "./auth/LoginPage";
+import { normalizeMuiIcon } from "./muiIcon";
+
+const InventoryIcon = normalizeMuiIcon(InventoryIconModule);
+const CategoryIcon = normalizeMuiIcon(CategoryIconModule);
+const ReceiptIcon = normalizeMuiIcon(ReceiptIconModule);
+const PeopleIcon = normalizeMuiIcon(PeopleIconModule);
+const ReviewsIcon = normalizeMuiIcon(ReviewsIconModule);
+const PersonRemoveIcon = normalizeMuiIcon(PersonRemoveIconModule);
+const FactCheckIcon = normalizeMuiIcon(FactCheckIconModule);
+const MarkEmailReadIcon = normalizeMuiIcon(MarkEmailReadIconModule);
+const ManageAccountsIcon = normalizeMuiIcon(ManageAccountsIconModule);
 
 // Interface 100% en français, y compris les textes intégrés de react-admin
 // (pagination, confirmations, messages d'erreur) — cohérent avec le reste

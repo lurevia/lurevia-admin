@@ -8,14 +8,22 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Chip from "@mui/material/Chip";
-import PeopleIcon from "@mui/icons-material/People";
-import InventoryIcon from "@mui/icons-material/Inventory2";
-import ReceiptIcon from "@mui/icons-material/ReceiptLong";
-import PaidIcon from "@mui/icons-material/Paid";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import PeopleIconModule from "@mui/icons-material/People";
+import InventoryIconModule from "@mui/icons-material/Inventory2";
+import ReceiptIconModule from "@mui/icons-material/ReceiptLong";
+import PaidIconModule from "@mui/icons-material/Paid";
+import WarningAmberIconModule from "@mui/icons-material/WarningAmber";
+import PersonRemoveIconModule from "@mui/icons-material/PersonRemove";
 import { StatCard } from "./StatCard";
 import { fetchAdminNotifications, fetchStats, type AdminNotificationRecord } from "../adminActions";
+import { normalizeMuiIcon } from "../muiIcon";
+
+const PeopleIcon = normalizeMuiIcon(PeopleIconModule);
+const InventoryIcon = normalizeMuiIcon(InventoryIconModule);
+const ReceiptIcon = normalizeMuiIcon(ReceiptIconModule);
+const PaidIcon = normalizeMuiIcon(PaidIconModule);
+const WarningAmberIcon = normalizeMuiIcon(WarningAmberIconModule);
+const PersonRemoveIcon = normalizeMuiIcon(PersonRemoveIconModule);
 
 const TYPE_LABEL: Record<AdminNotificationRecord["type"], string> = {
   NEW_ORDER: "Commande",

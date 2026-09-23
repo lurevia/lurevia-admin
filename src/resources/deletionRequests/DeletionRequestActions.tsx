@@ -6,9 +6,13 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
+import CheckIconModule from "@mui/icons-material/Check";
+import CloseIconModule from "@mui/icons-material/Close";
 import { approveDeletionRequest, rejectDeletionRequest } from "../../adminActions";
+import { normalizeMuiIcon } from "../../muiIcon";
+
+const CheckIcon = normalizeMuiIcon(CheckIconModule);
+const CloseIcon = normalizeMuiIcon(CloseIconModule);
 
 interface DeletionRequestActionsProps {
   variant: "approve" | "reject";

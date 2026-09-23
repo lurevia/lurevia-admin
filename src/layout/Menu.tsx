@@ -1,16 +1,28 @@
 import { Menu } from "react-admin";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import DashboardIcon from "@mui/icons-material/GridViewRounded";
-import InventoryIcon from "@mui/icons-material/Inventory2";
-import CategoryIcon from "@mui/icons-material/Category";
-import ReceiptIcon from "@mui/icons-material/ReceiptLong";
-import PeopleIcon from "@mui/icons-material/People";
-import ReviewsIcon from "@mui/icons-material/RateReview";
-import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import FactCheckIcon from "@mui/icons-material/FactCheck";
-import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import DashboardIconModule from "@mui/icons-material/GridViewRounded";
+import InventoryIconModule from "@mui/icons-material/Inventory2";
+import CategoryIconModule from "@mui/icons-material/Category";
+import ReceiptIconModule from "@mui/icons-material/ReceiptLong";
+import PeopleIconModule from "@mui/icons-material/People";
+import ReviewsIconModule from "@mui/icons-material/RateReview";
+import PersonRemoveIconModule from "@mui/icons-material/PersonRemove";
+import FactCheckIconModule from "@mui/icons-material/FactCheck";
+import MarkEmailReadIconModule from "@mui/icons-material/MarkEmailRead";
+import ManageAccountsIconModule from "@mui/icons-material/ManageAccounts";
+import { normalizeMuiIcon } from "../muiIcon";
+
+const DashboardIcon = normalizeMuiIcon(DashboardIconModule);
+const InventoryIcon = normalizeMuiIcon(InventoryIconModule);
+const CategoryIcon = normalizeMuiIcon(CategoryIconModule);
+const ReceiptIcon = normalizeMuiIcon(ReceiptIconModule);
+const PeopleIcon = normalizeMuiIcon(PeopleIconModule);
+const ReviewsIcon = normalizeMuiIcon(ReviewsIconModule);
+const PersonRemoveIcon = normalizeMuiIcon(PersonRemoveIconModule);
+const FactCheckIcon = normalizeMuiIcon(FactCheckIconModule);
+const MarkEmailReadIcon = normalizeMuiIcon(MarkEmailReadIconModule);
+const ManageAccountsIcon = normalizeMuiIcon(ManageAccountsIconModule);
 
 const SectionLabel = ({ children }: { children: string }) => (
   <Typography

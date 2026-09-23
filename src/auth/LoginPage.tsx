@@ -1,10 +1,10 @@
 import { FormEvent, useState } from "react";
 import { useLogin, useNotify } from "react-admin";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import VisibilityIconModule from "@mui/icons-material/Visibility";
+import VisibilityOffIconModule from "@mui/icons-material/VisibilityOff";
+import ArrowForwardIconModule from "@mui/icons-material/ArrowForward";
+import ShieldOutlinedIconModule from "@mui/icons-material/ShieldOutlined";
+import TrendingUpIconModule from "@mui/icons-material/TrendingUp";
 import {
   Alert,
   Box,
@@ -18,6 +18,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { normalizeMuiIcon } from "../muiIcon";
+
+const VisibilityIcon = normalizeMuiIcon(VisibilityIconModule);
+const VisibilityOffIcon = normalizeMuiIcon(VisibilityOffIconModule);
+const ArrowForwardIcon = normalizeMuiIcon(ArrowForwardIconModule);
+const ShieldOutlinedIcon = normalizeMuiIcon(ShieldOutlinedIconModule);
+const TrendingUpIcon = normalizeMuiIcon(TrendingUpIconModule);
 
 /**
  * Page de connexion — simple et claire, assortie au reste de l'admin :
