@@ -41,6 +41,11 @@ L'application est configurée pour l'URL du projet :
 - **Avis** : modération (suppression d'un avis inapproprié).
 - **Demandes de suppression de compte** : validation manuelle (approuver/rejeter avec note interne).
 - **Notifications** : cloche dans la barre du haut, alimentée à chaque action cliente qui modifie le serveur (nouvelle commande, nouvel avis, nouveau feedback, nouvelle demande de suppression). Écriture immédiate côté API (pas de recalcul à la lecture), lecture paginée — pensé pour rester rapide même à fort volume.
+- **Socle financier** : pilotage financier (cartes et évolution simple), vendeurs, contrats,
+  settlements, commissions et transferts. Ces ressources utilisent exclusivement le
+  `dataProvider` existant et ciblent les routes `/admin/{resource}`. Si une route n'est pas
+  encore déployée, l'interface conserve ses états de chargement/erreur et affiche un message
+  explicite plutôt que d'inventer des données.
 
 ## Limite connue
 

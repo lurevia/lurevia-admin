@@ -11,6 +11,10 @@ import PersonRemoveIconModule from "@mui/icons-material/PersonRemove";
 import FactCheckIconModule from "@mui/icons-material/FactCheck";
 import MarkEmailReadIconModule from "@mui/icons-material/MarkEmailRead";
 import ManageAccountsIconModule from "@mui/icons-material/ManageAccounts";
+import StorefrontIconModule from "@mui/icons-material/Storefront";
+import AccountBalanceIconModule from "@mui/icons-material/AccountBalance";
+import SwapHorizIconModule from "@mui/icons-material/SwapHoriz";
+import BarChartIconModule from "@mui/icons-material/BarChart";
 import { normalizeMuiIcon } from "../muiIcon";
 
 const DashboardIcon = normalizeMuiIcon(DashboardIconModule);
@@ -23,6 +27,10 @@ const PersonRemoveIcon = normalizeMuiIcon(PersonRemoveIconModule);
 const FactCheckIcon = normalizeMuiIcon(FactCheckIconModule);
 const MarkEmailReadIcon = normalizeMuiIcon(MarkEmailReadIconModule);
 const ManageAccountsIcon = normalizeMuiIcon(ManageAccountsIconModule);
+const StorefrontIcon = normalizeMuiIcon(StorefrontIconModule);
+const AccountBalanceIcon = normalizeMuiIcon(AccountBalanceIconModule);
+const SwapHorizIcon = normalizeMuiIcon(SwapHorizIconModule);
+const BarChartIcon = normalizeMuiIcon(BarChartIconModule);
 
 const SectionLabel = ({ children }: { children: string }) => (
   <Typography
@@ -74,6 +82,14 @@ export const LureviaMenu = () => (
     <SectionLabel>Ventes</SectionLabel>
     <Menu.Item to="/orders" primaryText="Commandes" leftIcon={<ReceiptIcon fontSize="small" />} />
     <Menu.Item to="/reviews" primaryText="Avis à modérer" leftIcon={<ReviewsIcon fontSize="small" />} />
+
+    <SectionLabel>Finance</SectionLabel>
+    <Menu.Item to="/financial-dashboard" primaryText="Pilotage financier" leftIcon={<BarChartIcon fontSize="small" />} />
+    <Menu.Item to="/sellers" primaryText="Vendeurs" leftIcon={<StorefrontIcon fontSize="small" />} />
+    <Menu.Item to="/contracts" primaryText="Contrats" leftIcon={<FactCheckIcon fontSize="small" />} />
+    <Menu.Item to="/settlements" primaryText="Settlements" leftIcon={<AccountBalanceIcon fontSize="small" />} />
+    <Menu.Item to="/commissions" primaryText="Commissions" leftIcon={<AccountBalanceIcon fontSize="small" />} />
+    <Menu.Item to="/transfers" primaryText="Transferts" leftIcon={<SwapHorizIcon fontSize="small" />} />
 
     <SectionLabel>Clients</SectionLabel>
     <Menu.Item to="/users" primaryText="Utilisateurs" leftIcon={<PeopleIcon fontSize="small" />} />

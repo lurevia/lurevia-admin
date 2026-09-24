@@ -13,6 +13,13 @@ const ADMIN_SCOPED = new Set([
   "deletion-requests",
   "profile-change-requests",
   "verifications",
+  // Financial resources live behind the admin namespace and use the same
+  // pagination/auth/error conventions as the existing admin resources.
+  "sellers",
+  "contracts",
+  "settlements",
+  "commissions",
+  "transfers",
 ]);
 
 // Clé sous laquelle l'API renvoie une ressource unique (create/update/getOne).
@@ -21,6 +28,11 @@ const SINGULAR_KEY: Record<string, string> = {
   categories: "category",
   orders: "order",
   users: "user",
+  sellers: "seller",
+  contracts: "contract",
+  settlements: "settlement",
+  commissions: "commission",
+  transfers: "transfer",
 };
 
 // Catégories : l'API ne pagine pas côté serveur (petit catalogue) et
@@ -28,7 +40,13 @@ const SINGULAR_KEY: Record<string, string> = {
 const CLIENT_SIDE_RESOURCES = new Set(["categories"]);
 
 const baseUrl = (resource: string) =>
-  ADMIN_SCOPED.has(resource) ? `${API_URL}/admin/${resource}` : `${API_URL}/${resource}`;
+  ADMIN_SCOPED.has(resource)
+    ? ["contracts", "settlements", "transfers"].includes(resource)
+      ? `${API_URL}/admin/financial/${resource}`
+      : resource === "commissions"
+        ? `${API_URL}/admin/financial/settlements`
+        : `${API_URL}/admin/${resource}`
+    : `${API_URL}/${resource}`;
 
 const buildQuery = (params: Record<string, unknown>): string => {
   const query = new URLSearchParams();

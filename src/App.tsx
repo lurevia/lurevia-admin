@@ -10,6 +10,9 @@ import PersonRemoveIconModule from "@mui/icons-material/PersonRemove";
 import FactCheckIconModule from "@mui/icons-material/FactCheck";
 import MarkEmailReadIconModule from "@mui/icons-material/MarkEmailRead";
 import ManageAccountsIconModule from "@mui/icons-material/ManageAccounts";
+import StorefrontIconModule from "@mui/icons-material/Storefront";
+import AccountBalanceIconModule from "@mui/icons-material/AccountBalance";
+import SwapHorizIconModule from "@mui/icons-material/SwapHoriz";
 import { CustomRoutes } from "react-admin";
 import { Route } from "react-router-dom";
 
@@ -34,6 +37,8 @@ import { DeletionRequestList } from "./resources/deletionRequests/DeletionReques
 import { ProfileChangeList } from "./resources/profileChanges/ProfileChangeList";
 import { VerificationList } from "./resources/verifications/VerificationList";
 import { AdminMessagePage } from "./resources/messages/AdminMessagePage";
+import { SellersList, ContractsList, SettlementsList, CommissionsList, TransfersList } from "./resources/finance/FinanceResources";
+import { FinancialDashboard } from "./resources/finance/FinancialDashboard";
 import { LureviaLoginPage } from "./auth/LoginPage";
 import { normalizeMuiIcon } from "./muiIcon";
 
@@ -46,6 +51,9 @@ const PersonRemoveIcon = normalizeMuiIcon(PersonRemoveIconModule);
 const FactCheckIcon = normalizeMuiIcon(FactCheckIconModule);
 const MarkEmailReadIcon = normalizeMuiIcon(MarkEmailReadIconModule);
 const ManageAccountsIcon = normalizeMuiIcon(ManageAccountsIconModule);
+const StorefrontIcon = normalizeMuiIcon(StorefrontIconModule);
+const AccountBalanceIcon = normalizeMuiIcon(AccountBalanceIconModule);
+const SwapHorizIcon = normalizeMuiIcon(SwapHorizIconModule);
 
 // Interface 100% en français, y compris les textes intégrés de react-admin
 // (pagination, confirmations, messages d'erreur) — cohérent avec le reste
@@ -96,6 +104,14 @@ export const App = () => (
     />
     <Resource name="profile-change-requests" list={ProfileChangeList} icon={ManageAccountsIcon} options={{ label: "Modifications de profil" }} />
     <Resource name="verifications" list={VerificationList} icon={FactCheckIcon} options={{ label: "Vérifications" }} />
-    <CustomRoutes><Route path="/messages" element={<AdminMessagePage />} /></CustomRoutes>
+    <Resource name="sellers" list={SellersList} icon={StorefrontIcon} options={{ label: "Vendeurs" }} />
+    <Resource name="contracts" list={ContractsList} icon={FactCheckIcon} options={{ label: "Contrats" }} />
+    <Resource name="settlements" list={SettlementsList} icon={AccountBalanceIcon} options={{ label: "Settlements" }} />
+    <Resource name="commissions" list={CommissionsList} icon={AccountBalanceIcon} options={{ label: "Commissions" }} />
+    <Resource name="transfers" list={TransfersList} icon={SwapHorizIcon} options={{ label: "Transferts" }} />
+    <CustomRoutes>
+      <Route path="/messages" element={<AdminMessagePage />} />
+      <Route path="/financial-dashboard" element={<FinancialDashboard />} />
+    </CustomRoutes>
   </Admin>
 );
