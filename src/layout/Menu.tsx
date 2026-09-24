@@ -15,6 +15,7 @@ import StorefrontIconModule from "@mui/icons-material/Storefront";
 import AccountBalanceIconModule from "@mui/icons-material/AccountBalance";
 import SwapHorizIconModule from "@mui/icons-material/SwapHoriz";
 import BarChartIconModule from "@mui/icons-material/BarChart";
+import AdminPanelSettingsIconModule from "@mui/icons-material/AdminPanelSettings";
 import { normalizeMuiIcon } from "../muiIcon";
 
 const DashboardIcon = normalizeMuiIcon(DashboardIconModule);
@@ -31,6 +32,7 @@ const StorefrontIcon = normalizeMuiIcon(StorefrontIconModule);
 const AccountBalanceIcon = normalizeMuiIcon(AccountBalanceIconModule);
 const SwapHorizIcon = normalizeMuiIcon(SwapHorizIconModule);
 const BarChartIcon = normalizeMuiIcon(BarChartIconModule);
+const AdminPanelSettingsIcon = normalizeMuiIcon(AdminPanelSettingsIconModule);
 
 const SectionLabel = ({ children }: { children: string }) => (
   <Typography
@@ -93,6 +95,7 @@ export const LureviaMenu = () => (
 
     <SectionLabel>Clients</SectionLabel>
     <Menu.Item to="/users" primaryText="Utilisateurs" leftIcon={<PeopleIcon fontSize="small" />} />
+    <Menu.Item to="/admins/create" primaryText="Créer un administrateur" leftIcon={<AdminPanelSettingsIcon fontSize="small" />} />
     <Menu.Item to="/verifications" primaryText="Vérifications de compte" leftIcon={<FactCheckIcon fontSize="small" />} />
     <Menu.Item
       to="/profile-change-requests"

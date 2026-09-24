@@ -38,6 +38,9 @@ L'application est configurée pour l'URL du projet :
 - **Produits / Catégories** : CRUD complet.
 - **Commandes** : vue de toutes les commandes (tous clients confondus), détail et changement de statut.
 - **Utilisateurs** : liste, recherche, changement de rôle (promouvoir/rétrograder un admin).
+- **Administrateurs** : création d'un compte administrateur depuis `/admins/create`. Cette
+  action nécessite une session déjà authentifiée avec le rôle `ADMIN` ; elle n'est jamais
+  proposée dans l'inscription publique.
 - **Avis** : modération (suppression d'un avis inapproprié).
 - **Demandes de suppression de compte** : validation manuelle (approuver/rejeter avec note interne).
 - **Notifications** : cloche dans la barre du haut, alimentée à chaque action cliente qui modifie le serveur (nouvelle commande, nouvel avis, nouveau feedback, nouvelle demande de suppression). Écriture immédiate côté API (pas de recalcul à la lecture), lecture paginée — pensé pour rester rapide même à fort volume.

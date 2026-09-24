@@ -37,6 +37,7 @@ import { DeletionRequestList } from "./resources/deletionRequests/DeletionReques
 import { ProfileChangeList } from "./resources/profileChanges/ProfileChangeList";
 import { VerificationList } from "./resources/verifications/VerificationList";
 import { AdminMessagePage } from "./resources/messages/AdminMessagePage";
+import { AdminCreate } from "./resources/admins/AdminCreate";
 import { SellersList, ContractsList, SettlementsList, CommissionsList, TransfersList } from "./resources/finance/FinanceResources";
 import { FinancialDashboard } from "./resources/finance/FinancialDashboard";
 import { LureviaLoginPage } from "./auth/LoginPage";
@@ -111,6 +112,7 @@ export const App = () => (
     <Resource name="transfers" list={TransfersList} icon={SwapHorizIcon} options={{ label: "Transferts" }} />
     <CustomRoutes>
       <Route path="/messages" element={<AdminMessagePage />} />
+      <Route path="/admins/create" element={<AdminCreate />} />
       <Route path="/financial-dashboard" element={<FinancialDashboard />} />
     </CustomRoutes>
   </Admin>
