@@ -15,6 +15,7 @@ export const UserEdit = () => (
         label="Rôle"
         choices={[
           { id: "CUSTOMER", name: "Client" },
+          { id: "SELLER", name: "Vendeur" },
           { id: "ADMIN", name: "Administrateur" },
         ]}
         helperText="Seul le rôle peut être modifié depuis cet écran."
