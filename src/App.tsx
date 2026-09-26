@@ -1,6 +1,9 @@
-import { Admin, Resource, resolveBrowserLocale } from "react-admin";
+import { useMemo } from "react";
+import { Admin, Resource, resolveBrowserLocale, CustomRoutes } from "react-admin";
 import polyglotI18nProvider from "ra-i18n-polyglot";
 import frenchMessages from "ra-language-french";
+import { Route } from "react-router-dom";
+
 import InventoryIconModule from "@mui/icons-material/Inventory2";
 import CategoryIconModule from "@mui/icons-material/Category";
 import ReceiptIconModule from "@mui/icons-material/ReceiptLong";
@@ -13,12 +16,9 @@ import ManageAccountsIconModule from "@mui/icons-material/ManageAccounts";
 import StorefrontIconModule from "@mui/icons-material/Storefront";
 import AccountBalanceIconModule from "@mui/icons-material/AccountBalance";
 import SwapHorizIconModule from "@mui/icons-material/SwapHoriz";
-import { CustomRoutes } from "react-admin";
-import { Route } from "react-router-dom";
 
 import { dataProvider } from "./dataProvider";
 import { authProvider } from "./authProvider";
-import { lureviaAdminTheme } from "./theme";
 import { LureviaLayout } from "./layout/Layout";
 import { Dashboard } from "./dashboard/Dashboard";
 
@@ -38,10 +38,19 @@ import { ProfileChangeList } from "./resources/profileChanges/ProfileChangeList"
 import { VerificationList } from "./resources/verifications/VerificationList";
 import { AdminMessagePage } from "./resources/messages/AdminMessagePage";
 import { AdminCreate } from "./resources/admins/AdminCreate";
-import { SellersList, ContractsList, SettlementsList, CommissionsList, TransfersList } from "./resources/finance/FinanceResources";
+import {
+  SellersList,
+  ContractsList,
+  SettlementsList,
+  CommissionsList,
+  TransfersList,
+} from "./resources/finance/FinanceResources";
 import { FinancialDashboard } from "./resources/finance/FinancialDashboard";
 import { LureviaLoginPage } from "./auth/LoginPage";
 import { normalizeMuiIcon } from "./muiIcon";
+
+import { ThemeCustomizerProvider, useThemeCustomizer } from "./theme/ThemeCustomizerContext";
+import { buildTheme } from "./theme/buildTheme";
 
 const InventoryIcon = normalizeMuiIcon(InventoryIconModule);
 const CategoryIcon = normalizeMuiIcon(CategoryIconModule);
@@ -56,64 +65,81 @@ const StorefrontIcon = normalizeMuiIcon(StorefrontIconModule);
 const AccountBalanceIcon = normalizeMuiIcon(AccountBalanceIconModule);
 const SwapHorizIcon = normalizeMuiIcon(SwapHorizIconModule);
 
-// Interface 100% en français, y compris les textes intégrés de react-admin
-// (pagination, confirmations, messages d'erreur) — cohérent avec le reste
-// du produit Lurevia.
 const i18nProvider = polyglotI18nProvider(
   () => frenchMessages,
   resolveBrowserLocale("fr")
 );
 
+/**
+ * Wrapper qui consomme le thème dynamique du contexte et l'applique à Admin.
+ * Doit être un enfant du ThemeCustomizerProvider pour accéder au hook.
+ */
+const ThemedAdmin = () => {
+  const { config } = useThemeCustomizer();
+  const theme = useMemo(() => buildTheme(config), [config]);
+
+  return (
+    <Admin
+      title="Lurevia — Espace Admin"
+      dataProvider={dataProvider}
+      authProvider={authProvider}
+      i18nProvider={i18nProvider}
+      theme={theme}
+      layout={LureviaLayout}
+      dashboard={Dashboard}
+      loginPage={LureviaLoginPage}
+      basename="/lurevia-admin"
+      requireAuth
+      disableTelemetry
+    >
+      <Resource
+        name="products"
+        list={ProductList}
+        edit={ProductEdit}
+        create={ProductCreate}
+        icon={InventoryIcon}
+        options={{ label: "Produits" }}
+      />
+      <Resource
+        name="categories"
+        list={CategoryList}
+        edit={CategoryEdit}
+        create={CategoryCreate}
+        icon={CategoryIcon}
+        options={{ label: "Catégories" }}
+      />
+      <Resource name="orders" list={OrderList} edit={OrderEdit} icon={ReceiptIcon} options={{ label: "Commandes" }} />
+      <Resource name="users" list={UserList} edit={UserEdit} icon={PeopleIcon} options={{ label: "Utilisateurs" }} />
+      <Resource name="reviews" list={ReviewList} icon={ReviewsIcon} options={{ label: "Avis" }} />
+      <Resource
+        name="deletion-requests"
+        list={DeletionRequestList}
+        icon={PersonRemoveIcon}
+        options={{ label: "Suppressions" }}
+      />
+      <Resource
+        name="profile-change-requests"
+        list={ProfileChangeList}
+        icon={ManageAccountsIcon}
+        options={{ label: "Modifications de profil" }}
+      />
+      <Resource name="verifications" list={VerificationList} icon={FactCheckIcon} options={{ label: "Vérifications" }} />
+      <Resource name="sellers" list={SellersList} icon={StorefrontIcon} options={{ label: "Vendeurs" }} />
+      <Resource name="contracts" list={ContractsList} icon={FactCheckIcon} options={{ label: "Contrats" }} />
+      <Resource name="settlements" list={SettlementsList} icon={AccountBalanceIcon} options={{ label: "Settlements" }} />
+      <Resource name="commissions" list={CommissionsList} icon={AccountBalanceIcon} options={{ label: "Commissions" }} />
+      <Resource name="transfers" list={TransfersList} icon={SwapHorizIcon} options={{ label: "Transferts" }} />
+      <CustomRoutes>
+        <Route path="/messages" element={<AdminMessagePage />} />
+        <Route path="/admins/create" element={<AdminCreate />} />
+        <Route path="/financial-dashboard" element={<FinancialDashboard />} />
+      </CustomRoutes>
+    </Admin>
+  );
+};
+
 export const App = () => (
-  <Admin
-    title="Lurevia — Espace Admin"
-    dataProvider={dataProvider}
-    authProvider={authProvider}
-    i18nProvider={i18nProvider}
-    theme={lureviaAdminTheme}
-    layout={LureviaLayout}
-    dashboard={Dashboard}
-    loginPage={LureviaLoginPage}
-    basename="/lurevia-admin"
-    requireAuth
-    disableTelemetry
-  >
-    <Resource
-      name="products"
-      list={ProductList}
-      edit={ProductEdit}
-      create={ProductCreate}
-      icon={InventoryIcon}
-      options={{ label: "Produits" }}
-    />
-    <Resource
-      name="categories"
-      list={CategoryList}
-      edit={CategoryEdit}
-      create={CategoryCreate}
-      icon={CategoryIcon}
-      options={{ label: "Catégories" }}
-    />
-    <Resource name="orders" list={OrderList} edit={OrderEdit} icon={ReceiptIcon} options={{ label: "Commandes" }} />
-    <Resource name="users" list={UserList} edit={UserEdit} icon={PeopleIcon} options={{ label: "Utilisateurs" }} />
-    <Resource name="reviews" list={ReviewList} icon={ReviewsIcon} options={{ label: "Avis" }} />
-    <Resource
-      name="deletion-requests"
-      list={DeletionRequestList}
-      icon={PersonRemoveIcon}
-      options={{ label: "Suppressions" }}
-    />
-    <Resource name="profile-change-requests" list={ProfileChangeList} icon={ManageAccountsIcon} options={{ label: "Modifications de profil" }} />
-    <Resource name="verifications" list={VerificationList} icon={FactCheckIcon} options={{ label: "Vérifications" }} />
-    <Resource name="sellers" list={SellersList} icon={StorefrontIcon} options={{ label: "Vendeurs" }} />
-    <Resource name="contracts" list={ContractsList} icon={FactCheckIcon} options={{ label: "Contrats" }} />
-    <Resource name="settlements" list={SettlementsList} icon={AccountBalanceIcon} options={{ label: "Settlements" }} />
-    <Resource name="commissions" list={CommissionsList} icon={AccountBalanceIcon} options={{ label: "Commissions" }} />
-    <Resource name="transfers" list={TransfersList} icon={SwapHorizIcon} options={{ label: "Transferts" }} />
-    <CustomRoutes>
-      <Route path="/messages" element={<AdminMessagePage />} />
-      <Route path="/admins/create" element={<AdminCreate />} />
-      <Route path="/financial-dashboard" element={<FinancialDashboard />} />
-    </CustomRoutes>
-  </Admin>
+  <ThemeCustomizerProvider>
+    <ThemedAdmin />
+  </ThemeCustomizerProvider>
 );
