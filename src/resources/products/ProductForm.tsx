@@ -9,6 +9,7 @@ import {
   SelectArrayInput,
   required,
 } from "react-admin";
+import { ImageDropInput } from "../../components/ImageDropInput";
 
 export const ProductForm = () => (
   <SimpleForm>
@@ -26,11 +27,7 @@ export const ProductForm = () => (
       <SelectArrayInput optionText="name" validate={required()} />
     </ReferenceArrayInput>
 
-    <ArrayInput source="images" label="Images (URLs)" defaultValue={[]}>
-      <SimpleFormIterator inline>
-        <TextInput source="" label="URL" />
-      </SimpleFormIterator>
-    </ArrayInput>
+    <ImageDropInput source="images" label="Images du produit" multiple defaultValue={[]} />
 
     <ArrayInput source="tags" label="Tags" defaultValue={[]}>
       <SimpleFormIterator inline>
