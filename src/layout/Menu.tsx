@@ -5,16 +5,14 @@ import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Collapse from "@mui/material/Collapse";
 import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
-import MenuOpenIconModule from "@mui/icons-material/MenuOpen";
-import MenuIconModule from "@mui/icons-material/Menu";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 import ExpandMoreIconModule from "@mui/icons-material/ExpandMore";
 import LogoutIconModule from "@mui/icons-material/Logout";
 import DashboardIconModule from "@mui/icons-material/GridViewRounded";
@@ -34,11 +32,8 @@ import BarChartIconModule from "@mui/icons-material/BarChart";
 import AdminPanelSettingsIconModule from "@mui/icons-material/AdminPanelSettings";
 import type { SvgIconComponent } from "@mui/icons-material";
 import { normalizeMuiIcon } from "../muiIcon";
-import { useMenuCollapse } from "./MenuCollapseContext";
 
-// ─── Icônes normalisées ───
-const MenuOpenIcon = normalizeMuiIcon(MenuOpenIconModule);
-const MenuIcon = normalizeMuiIcon(MenuIconModule);
+// ─── Icônes normalisées (obligatoire pour éviter React error #130) ───
 const ExpandMoreIcon = normalizeMuiIcon(ExpandMoreIconModule);
 const LogoutIcon = normalizeMuiIcon(LogoutIconModule);
 const DashboardIcon = normalizeMuiIcon(DashboardIconModule);
@@ -57,8 +52,10 @@ const SwapHorizIcon = normalizeMuiIcon(SwapHorizIconModule);
 const BarChartIcon = normalizeMuiIcon(BarChartIconModule);
 const AdminPanelSettingsIcon = normalizeMuiIcon(AdminPanelSettingsIconModule);
 
+// ─── Persistance ───
 const STORAGE_OPEN_KEY = "lurevia-admin-menu-open-categories";
 
+// ─── Types ───
 interface MenuItemConfig {
   to: string;
   label: string;
@@ -72,6 +69,14 @@ interface MenuCategoryConfig {
   items: MenuItemConfig[];
 }
 
+interface FullIdentity {
+  id?: string | number;
+  fullName?: string;
+  avatar?: string;
+  email?: string;
+}
+
+// ─── Configuration du menu ───
 const MENU_CATEGORIES: MenuCategoryConfig[] = [
   {
     id: "catalogue",
@@ -110,15 +115,16 @@ const MENU_CATEGORIES: MenuCategoryConfig[] = [
     icon: PeopleIcon,
     items: [
       { to: "/users", label: "Utilisateurs", icon: PeopleIcon },
-      { to: "/admins/create", label: "Créer un administrateur", icon: AdminPanelSettingsIcon },
-      { to: "/verifications", label: "Vérifications de compte", icon: FactCheckIcon },
-      { to: "/profile-change-requests", label: "Modifications de profil", icon: ManageAccountsIcon },
-      { to: "/deletion-requests", label: "Suppressions de compte", icon: PersonRemoveIcon },
+      { to: "/admins/create", label: "Créer un admin", icon: AdminPanelSettingsIcon },
+      { to: "/verifications", label: "Vérifications", icon: FactCheckIcon },
+      { to: "/profile-change-requests", label: "Modifs profil", icon: ManageAccountsIcon },
+      { to: "/deletion-requests", label: "Suppressions", icon: PersonRemoveIcon },
       { to: "/messages", label: "Messages clients", icon: MarkEmailReadIcon },
     ],
   },
 ];
 
+// ─── Helpers ───
 const matchesPath = (pathname: string, to: string) => {
   if (to === "/") return pathname === "/";
   return pathname === to || pathname.startsWith(to + "/");
@@ -133,54 +139,40 @@ const findActiveCategoryId = (pathname: string): string | null => {
   return null;
 };
 
-const categoryHeaderSx = (collapsed: boolean) => ({
-  borderRadius: 1,
-  margin: "2px 8px",
-  minHeight: 40,
-  pl: collapsed ? 0 : 1.5,
-  pr: collapsed ? 0 : 1.5,
-  justifyContent: collapsed ? "center" : "flex-start",
-  "& .MuiListItemIcon-root": {
-    minWidth: collapsed ? 0 : 32,
-    mr: collapsed ? 0 : 1,
-    justifyContent: "center",
-  },
-}) as const;
+const getActiveLabel = (pathname: string): string => {
+  if (pathname === "/") return "Tableau de bord";
+  for (const cat of MENU_CATEGORIES) {
+    for (const item of cat.items) {
+      if (matchesPath(pathname, item.to)) return item.label;
+    }
+  }
+  return "";
+};
 
-const itemLinkSx = (active: boolean) => ({
-  borderRadius: 1,
-  margin: "2px 8px 2px 20px",
-  minHeight: 36,
-  pl: 1.5,
-  pr: 1.5,
-  ...(active && {
-    backgroundColor: "action.selected",
-    "&:hover": { backgroundColor: "action.selected" },
-  }),
-}) as const;
-
-const MenuContainer = styled(Box)({
-  // ✅ On prend 100% de la largeur du Drawer parent.
+// ─── Styles ───
+const MenuContainer = styled(Box)(({ theme }) => ({
   width: "100%",
   height: "100%",
   display: "flex",
   flexDirection: "column",
-  overflow: "hidden",
-});
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.text.primary,
+  boxSizing: "border-box",
+}));
 
 const MenuHeader = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  justifyContent: "space-between",
-  padding: theme.spacing(1.5),
-  minHeight: 56,
-  gap: theme.spacing(1),
+  gap: theme.spacing(1.5),
+  padding: theme.spacing(2, 2, 1),
   flexShrink: 0,
+  width: "100%",
+  boxSizing: "border-box",
 }));
 
 const LogoBox = styled(Box)(({ theme }) => ({
-  width: 34,
-  height: 34,
+  width: 32,
+  height: 32,
   borderRadius: theme.shape.borderRadius,
   backgroundColor: theme.palette.primary.main,
   color: theme.palette.primary.contrastText,
@@ -188,17 +180,30 @@ const LogoBox = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   fontWeight: 800,
-  fontSize: 16,
+  fontSize: 15,
   flexShrink: 0,
+}));
+
+const ActiveLabel = styled(Typography)(({ theme }) => ({
+  fontSize: 10.5,
+  fontWeight: 700,
+  letterSpacing: 1.2,
+  textTransform: "uppercase",
+  color: theme.palette.primary.main,
+  padding: theme.spacing(0, 2, 1),
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 }));
 
 const ScrollArea = styled(Box)({
   flex: 1,
   overflowY: "auto",
   overflowX: "hidden",
-  "&::-webkit-scrollbar": { width: 6 },
+  paddingTop: 4,
+  "&::-webkit-scrollbar": { width: 5 },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "rgba(128,128,128,0.25)",
+    backgroundColor: "rgba(128,128,128,0.2)",
     borderRadius: 3,
   },
 });
@@ -206,14 +211,19 @@ const ScrollArea = styled(Box)({
 const FooterArea = styled(Box)(({ theme }) => ({
   flexShrink: 0,
   borderTop: `1px solid ${theme.palette.divider}`,
-  padding: theme.spacing(1),
+  padding: theme.spacing(1.5, 2),
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: theme.spacing(1),
 }));
 
+// ─── Composant principal ───
 export const LureviaMenu = () => {
   const location = useLocation();
   const logout = useLogout();
   const { identity } = useGetIdentity();
-  const { collapsed, toggle, isMobile } = useMenuCollapse();
+  const typedIdentity = identity as FullIdentity | undefined;
 
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(() => {
     if (typeof window === "undefined") return {};
@@ -225,12 +235,14 @@ export const LureviaMenu = () => {
     }
   });
 
+  // Persistance de l'état ouvert/fermé
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_OPEN_KEY, JSON.stringify(openCategories));
     }
   }, [openCategories]);
 
+  // Auto-ouverture de la catégorie active
   useEffect(() => {
     const activeId = findActiveCategoryId(location.pathname);
     if (activeId) {
@@ -246,79 +258,76 @@ export const LureviaMenu = () => {
 
   const handleLogout = () => logout();
 
-  const initial = identity?.fullName?.charAt(0).toUpperCase() ?? "?";
-  const displayName = identity?.fullName ?? "Utilisateur";
+  const initial = typedIdentity?.fullName?.charAt(0).toUpperCase() ?? "A";
+  const activeLabel = getActiveLabel(location.pathname);
 
   return (
     <MenuContainer>
+      {/* ═══════ HEADER : Logo + Nom ═══════ */}
       <MenuHeader>
-        {!collapsed ? (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, overflow: "hidden" }}>
-            <LogoBox>L</LogoBox>
-            <Typography
-              sx={{
-                fontWeight: 800,
-                fontSize: 15,
-                whiteSpace: "nowrap",
-                color: "text.primary",
-              }}
-            >
-              Lurevia
-            </Typography>
-          </Box>
-        ) : (
-          <LogoBox>L</LogoBox>
-        )}
-
-        {/* Le toggle n'a de sens que sur desktop */}
-        {!isMobile && (
-          <Tooltip title={collapsed ? "Déployer le menu" : "Réduire le menu"} arrow>
-            <IconButton
-              size="small"
-              onClick={toggle}
-              sx={{
-                ml: collapsed ? 0 : "auto",
-                color: "text.secondary",
-                "&:hover": { color: "primary.main" },
-              }}
-              aria-label={collapsed ? "Déployer le menu" : "Réduire le menu"}
-            >
-              {collapsed ? <MenuIcon fontSize="small" /> : <MenuOpenIcon fontSize="small" />}
-            </IconButton>
-          </Tooltip>
-        )}
+        <LogoBox>L</LogoBox>
+        <Typography
+          sx={{
+            fontWeight: 800,
+            fontSize: 15,
+            color: "text.primary",
+            letterSpacing: "-0.3px",
+          }}
+        >
+          Lurevia
+        </Typography>
       </MenuHeader>
+
+      {/* Section active */}
+      {activeLabel && <ActiveLabel>{activeLabel}</ActiveLabel>}
 
       <Divider />
 
+      {/* ═══════ ZONE DÉFILANTE ═══════ */}
       <ScrollArea>
         <List disablePadding sx={{ pt: 1, pb: 1 }}>
-          <Tooltip title={collapsed ? "Tableau de bord" : ""} placement="right" arrow>
-            <ListItemButton
-              component={Link}
-              to="/"
+          {/* ─── Tableau de bord ─── */}
+          <ListItemButton
+            component={Link}
+            to="/"
+            sx={{
+              borderRadius: 1.5,
+              margin: "2px 8px",
+              minHeight: 40,
+              pl: 1.5,
+              pr: 1.5,
+              color: matchesPath(location.pathname, "/")
+                ? "text.primary"
+                : "text.secondary",
+              ...(matchesPath(location.pathname, "/") && {
+                backgroundColor: "action.selected",
+                "&:hover": { backgroundColor: "action.selected" },
+              }),
+              "&:hover": { backgroundColor: "action.hover" },
+            }}
+          >
+            <ListItemIcon
               sx={{
-                ...itemLinkSx(matchesPath(location.pathname, "/")),
-                margin: "2px 8px",
-                justifyContent: collapsed ? "center" : "flex-start",
-                pl: collapsed ? 0 : 1.5,
+                minWidth: 32,
+                color: matchesPath(location.pathname, "/")
+                  ? "text.primary"
+                  : "text.secondary",
               }}
             >
-              <ListItemIcon
-                sx={{
-                  minWidth: collapsed ? 0 : 32,
-                  mr: collapsed ? 0 : 1,
-                  justifyContent: "center",
-                }}
-              >
-                <DashboardIcon fontSize="small" />
-              </ListItemIcon>
-              {!collapsed && <ListItemText primary="Tableau de bord" />}
-            </ListItemButton>
-          </Tooltip>
+              <DashboardIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText
+              primary="Tableau de bord"
+              primaryTypographyProps={{
+                fontSize: 13.5,
+                fontWeight: matchesPath(location.pathname, "/") ? 700 : 500,
+              }}
+            />
+          </ListItemButton>
 
-          <Divider sx={{ mx: 2, my: 1.5 }} />
+          <Divider sx={{ mx: 2, my: 1 }} />
 
+          {/* ─── Catégories en accordéon ─── */}
           {MENU_CATEGORIES.map((category) => {
             const CategoryIcon = category.icon;
             const isOpen = !!openCategories[category.id];
@@ -328,139 +337,132 @@ export const LureviaMenu = () => {
 
             return (
               <Box key={category.id}>
-                <Tooltip title={collapsed ? category.label : ""} placement="right" arrow>
-                  <ListItemButton
-                    onClick={() => toggleCategory(category.id)}
-                    sx={{
-                      ...categoryHeaderSx(collapsed),
-                      ...(hasActiveChild && !isOpen && { color: "primary.main" }),
+                {/* En-tête de catégorie */}
+                <ListItemButton
+                  onClick={() => toggleCategory(category.id)}
+                  sx={{
+                    borderRadius: 1.5,
+                    margin: "2px 8px",
+                    minHeight: 40,
+                    pl: 1.5,
+                    pr: 1.5,
+                    color:
+                      hasActiveChild && !isOpen
+                        ? "primary.main"
+                        : "text.primary",
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <CategoryIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={category.label}
+                    primaryTypographyProps={{
+                      fontSize: 13.5,
+                      fontWeight: 600,
+                      whiteSpace: "nowrap",
                     }}
-                  >
-                    <ListItemIcon>
-                      <CategoryIcon fontSize="small" />
-                    </ListItemIcon>
+                  />
+                  <ExpandMoreIcon
+                    fontSize="small"
+                    sx={{
+                      transition: "transform 0.2s ease",
+                      transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      opacity: 0.6,
+                      ml: 1,
+                      flexShrink: 0,
+                    }}
+                  />
+                </ListItemButton>
 
-                    {!collapsed && (
-                      <>
-                        <ListItemText
-                          primary={category.label}
-                          primaryTypographyProps={{
-                            fontSize: 13.5,
-                            fontWeight: 600,
-                            whiteSpace: "nowrap",
-                          }}
-                        />
-                        <ExpandMoreIcon
-                          fontSize="small"
+                {/* Sous-items repliables */}
+                <Collapse in={isOpen} timeout={200}>
+                  <List disablePadding>
+                    {category.items.map((item) => {
+                      const ItemIcon = item.icon;
+                      const active = matchesPath(location.pathname, item.to);
+
+                      return (
+                        <ListItemButton
+                          key={item.to}
+                          component={Link}
+                          to={item.to}
                           sx={{
-                            transition: "transform 0.2s ease",
-                            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                            opacity: 0.6,
+                            borderRadius: 1.5,
+                            margin: "2px 8px 2px 20px",
+                            minHeight: 36,
+                            pl: 1.5,
+                            pr: 1.5,
+                            color: active ? "text.primary" : "text.secondary",
+                            ...(active && {
+                              backgroundColor: "action.selected",
+                              "&:hover": { backgroundColor: "action.selected" },
+                            }),
+                            "&:hover": { backgroundColor: "action.hover" },
                           }}
-                        />
-                      </>
-                    )}
-                  </ListItemButton>
-                </Tooltip>
-
-                {!collapsed && (
-                  <Collapse in={isOpen} timeout={200} unmountOnExit>
-                    <List disablePadding>
-                      {category.items.map((item) => {
-                        const ItemIcon = item.icon;
-                        const active = matchesPath(location.pathname, item.to);
-
-                        return (
-                          <ListItemButton
-                            key={item.to}
-                            component={Link}
-                            to={item.to}
-                            sx={itemLinkSx(active)}
+                        >
+                          <ListItemIcon
+                            sx={{
+                              minWidth: 32,
+                              color: active ? "text.primary" : "text.secondary",
+                            }}
                           >
-                            <ListItemIcon sx={{ minWidth: 32 }}>
-                              <ItemIcon fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={item.label}
-                              primaryTypographyProps={{
-                                fontSize: 13,
-                                fontWeight: active ? 700 : 500,
-                                whiteSpace: "nowrap",
-                              }}
-                            />
-                          </ListItemButton>
-                        );
-                      })}
-                    </List>
-                  </Collapse>
-                )}
+                            <ItemIcon fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={item.label}
+                            primaryTypographyProps={{
+                              fontSize: 13,
+                              fontWeight: active ? 700 : 500,
+                              whiteSpace: "nowrap",
+                            }}
+                          />
+                        </ListItemButton>
+                      );
+                    })}
+                  </List>
+                </Collapse>
               </Box>
             );
           })}
         </List>
       </ScrollArea>
 
+      {/* ═══════ FOOTER : Avatar + Déconnexion ═══════ */}
       <FooterArea>
-        <Tooltip title={collapsed ? `${displayName} — Se déconnecter` : ""} placement="right" arrow>
-          <ListItemButton
+        <Avatar
+          src={typedIdentity?.avatar}
+          alt="Utilisateur"
+          sx={{
+            width: 36,
+            height: 36,
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
+            fontSize: 13,
+            fontWeight: 700,
+            flexShrink: 0,
+            cursor: "pointer",
+          }}
+        >
+          {initial}
+        </Avatar>
+
+        <Tooltip title="Se déconnecter" arrow>
+          <IconButton
+            size="small"
             onClick={handleLogout}
             sx={{
-              borderRadius: 1,
-              justifyContent: collapsed ? "center" : "flex-start",
-              pl: collapsed ? 0 : 1,
-              pr: collapsed ? 0 : 1,
-              "&:hover": { backgroundColor: "action.hover" },
+              color: "text.secondary",
+              flexShrink: 0,
+              "&:hover": {
+                color: "error.main",
+                backgroundColor: "action.hover",
+              },
             }}
+            aria-label="Se déconnecter"
           >
-            <ListItemIcon
-              sx={{
-                minWidth: collapsed ? 0 : 40,
-                mr: collapsed ? 0 : 1,
-                justifyContent: "center",
-              }}
-            >
-              <Avatar
-                src={identity?.avatar}
-                alt={displayName}
-                sx={{
-                  width: 30,
-                  height: 30,
-                  bgcolor: "primary.main",
-                  color: "primary.contrastText",
-                  fontSize: 12,
-                  fontWeight: 700,
-                }}
-              >
-                {initial}
-              </Avatar>
-            </ListItemIcon>
-
-            {!collapsed && (
-              <>
-                <Box sx={{ flex: 1, minWidth: 0, ml: 1 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {displayName}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ whiteSpace: "nowrap" }}
-                  >
-                    Se déconnecter
-                  </Typography>
-                </Box>
-                <LogoutIcon fontSize="small" sx={{ opacity: 0.6 }} />
-              </>
-            )}
-          </ListItemButton>
+            <LogoutIcon sx={{ fontSize: "1.15rem" }} />
+          </IconButton>
         </Tooltip>
       </FooterArea>
     </MenuContainer>
