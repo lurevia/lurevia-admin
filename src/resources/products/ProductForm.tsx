@@ -17,10 +17,12 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Divider,
   IconButton,
   Paper,
   Stack,
+  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -38,6 +40,7 @@ import {
   type AIGeneratedProductDetails,
 } from "../../components/AIGenerateDialog";
 import { AIImageEditDialog } from "../../components/AIImageEditDialog";
+import { mediaApi, readFileAsDataUrl } from "../../mediaApi";
 
 // ─── Icônes normalisées ───
 const InfoIcon = normalizeMuiIcon(InfoOutlinedIconModule);
@@ -390,6 +393,9 @@ const ProductFormContent = () => {
       : [];
 
   const [images, setImages] = useState<string[]>(initialImages);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [imageUrlDraft, setImageUrlDraft] = useState("");
+  const [imageUploadError, setImageUploadError] = useState("");
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const editingImageIndex = useRef<number>(-1);
 
@@ -415,36 +421,61 @@ const ProductFormContent = () => {
     setValue("images", newImages, { shouldDirty: true });
   };
 
-  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
-
-    const readers: Promise<string>[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      if (!file.type.startsWith("image/")) continue;
-      if (file.size > 2 * 1024 * 1024) continue;
-
-      readers.push(
-        new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const result = e.target?.result;
-            resolve(typeof result === "string" ? result : "");
-          };
-          reader.readAsDataURL(file);
-        })
-      );
+    const acceptedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    const selectedFiles = Array.from(files);
+    const validFiles = selectedFiles.filter((file) =>
+      acceptedTypes.includes(file.type) && file.size <= 2 * 1024 * 1024
+    );
+    if (validFiles.length !== selectedFiles.length) {
+      setImageUploadError("Formats acceptés : JPG, PNG, GIF ou WebP, jusqu'à 2 Mo par image.");
+    } else {
+      setImageUploadError("");
+    }
+    if (validFiles.length === 0) {
+      if (event.target) event.target.value = "";
+      return;
     }
 
-    Promise.all(readers).then((newUrls) => {
-      const cleanUrls = newUrls.filter(Boolean);
-      if (cleanUrls.length > 0) {
-        syncImagesToForm([...images, ...cleanUrls]);
+    setUploadingImages(true);
+    try {
+      const uploaded = await Promise.all(validFiles.map(async (file) => {
+        const dataUrl = await readFileAsDataUrl(file);
+        return mediaApi.uploadDataUrl(dataUrl);
+      }));
+      const uploadedUrls = uploaded.map((media) => media.publicUrl);
+      const replaceIndex = editingImageIndex.current;
+      if (replaceIndex >= 0 && replaceIndex < images.length) {
+        const next = [...images];
+        next[replaceIndex] = uploadedUrls[0];
+        syncImagesToForm(next);
+      } else {
+        syncImagesToForm([...images, ...uploadedUrls]);
       }
-    });
+      editingImageIndex.current = -1;
+    } catch (err) {
+      setImageUploadError(err instanceof Error ? err.message : "L'envoi des images a échoué.");
+    } finally {
+      setUploadingImages(false);
+      if (event.target) event.target.value = "";
+    }
+  };
 
-    if (event.target) event.target.value = "";
+  const handleImportImageUrl = async () => {
+    if (!imageUrlDraft.trim()) return;
+    setUploadingImages(true);
+    setImageUploadError("");
+    try {
+      const uploaded = await mediaApi.importUrl(imageUrlDraft);
+      syncImagesToForm([...images, uploaded.publicUrl]);
+      setImageUrlDraft("");
+    } catch (err) {
+      setImageUploadError(err instanceof Error ? err.message : "L'import de l'image a échoué.");
+    } finally {
+      setUploadingImages(false);
+    }
   };
 
   const handleRemoveImage = (index: number) => {
@@ -739,12 +770,36 @@ const ProductFormContent = () => {
                   variant="outlined"
                   size="small"
                   fullWidth
+                  disabled={uploadingImages}
                   startIcon={<AddPhotoIcon fontSize="small" />}
                   onClick={() => openImagePicker()}
                   sx={{ textTransform: "none", fontWeight: 600, fontSize: 12 }}
                 >
                   Ajouter une image
                 </Button>
+                <Stack direction="row" spacing={0.75}>
+                  <TextField
+                    value={imageUrlDraft}
+                    onChange={(event) => setImageUrlDraft(event.target.value)}
+                    placeholder="URL d'image à importer"
+                    size="small"
+                    fullWidth
+                    inputProps={{ "aria-label": "URL d'image à importer" }}
+                  />
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    disabled={uploadingImages || !imageUrlDraft.trim()}
+                    onClick={() => void handleImportImageUrl()}
+                  >
+                    {uploadingImages ? <CircularProgress size={16} /> : "Importer"}
+                  </Button>
+                </Stack>
+                {imageUploadError && (
+                  <Alert severity="error" sx={{ py: 0.25, "& .MuiAlert-message": { fontSize: 11.5 } }}>
+                    {imageUploadError}
+                  </Alert>
+                )}
                 {images.length > 0 && (
                   <Button
                     variant="outlined"

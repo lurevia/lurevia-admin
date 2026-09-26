@@ -7,7 +7,7 @@ import {
   Title,
 } from "react-admin";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Alert,
   Box,
@@ -793,9 +793,9 @@ const ProductGrid = () => {
   const redirect = useRedirect();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const urlParams = new URLSearchParams(location.search);
-  const categoryIdFromUrl = urlParams.get("categoryId");
+  const categoryIdFromUrl = searchParams.get("categoryId");
 
   const { data: activeCategory } = useGetOne(
     "categories",
@@ -862,10 +862,10 @@ const ProductGrid = () => {
   };
 
   const handleCategoryChange = (id: string | null) => {
-    const url = new URL(window.location.href);
-    if (id) url.searchParams.set("categoryId", id);
-    else url.searchParams.delete("categoryId");
-    navigate(url.pathname + url.search, { replace: true });
+    const nextSearchParams = new URLSearchParams(searchParams);
+    if (id) nextSearchParams.set("categoryId", id);
+    else nextSearchParams.delete("categoryId");
+    setSearchParams(nextSearchParams, { replace: true });
     setFilters({ ...filterValues, categoryId: id ?? undefined }, {});
     setPage(1);
   };
@@ -890,9 +890,9 @@ const ProductGrid = () => {
     setPriceRange("");
     setStockFilter("");
     setStatusFilter("");
-    const url = new URL(window.location.href);
-    url.searchParams.delete("categoryId");
-    navigate(url.pathname + url.search, { replace: true });
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("categoryId");
+    setSearchParams(nextSearchParams, { replace: true });
     setFilters({}, {});
     setPage(1);
   };

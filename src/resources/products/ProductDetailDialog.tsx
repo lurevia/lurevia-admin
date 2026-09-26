@@ -60,6 +60,11 @@ export const ProductDetailDialog = ({ open, onClose, record, onEdit }: Props) =>
     Array.isArray(record.images) && record.images.length > 0
       ? record.images.map((img: any) => (typeof img === "string" ? img : img.url))
       : [];
+  const categories = Array.isArray(record.categories) && record.categories.length > 0
+    ? record.categories.map((category: any) => category.name ?? category.slug).filter(Boolean)
+    : Array.isArray(record.categorySlugs)
+      ? record.categorySlugs
+      : [];
 
   const stock = record.stock ?? 0;
   const isOutOfStock = stock === 0;
@@ -344,6 +349,22 @@ export const ProductDetailDialog = ({ open, onClose, record, onEdit }: Props) =>
                 >
                   {record.longDescription}
                 </Typography>
+              </Box>
+            )}
+
+            {categories.length > 0 && (
+              <Box sx={{ mb: 2 }}>
+                <Typography
+                  variant="overline"
+                  sx={{ fontWeight: 700, color: "text.secondary", fontSize: 10.5 }}
+                >
+                  Catégories
+                </Typography>
+                <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap sx={{ mt: 0.5 }}>
+                  {categories.map((category: string) => (
+                    <Chip key={category} label={category} size="small" />
+                  ))}
+                </Stack>
               </Box>
             )}
 

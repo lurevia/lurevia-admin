@@ -31,6 +31,7 @@ import InfoOutlinedIconModule from "@mui/icons-material/InfoOutlined";
 import { normalizeMuiIcon } from "../muiIcon";
 import { useThemeCustomizer } from "../theme/ThemeCustomizerContext";
 import { API_URL, httpClient } from "../httpClient";
+import { mediaApi, readFileAsDataUrl } from "../mediaApi";
 import { PresetGallery } from "./PresetGallery";
 import { ThemeControls } from "./ThemeControls";
 import { useSearchParams } from "react-router-dom";
@@ -59,6 +60,7 @@ export const ProfilePage = () => {
         searchParams.get("tab") === "theme" ? "theme" : "info"
     );
     const [saving, setSaving] = useState(false);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
     // Infos profil
     const [fullName, setFullName] = useState(identity?.fullName ?? "");
@@ -75,24 +77,29 @@ export const ProfilePage = () => {
     }, [identity]);
 
     // ─── Avatar upload ───
-    const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
-        if (!file.type.startsWith("image/")) {
-            notify("Le fichier doit être une image.", { type: "warning" });
+        if (!["image/jpeg", "image/png", "image/gif", "image/webp"].includes(file.type)) {
+            notify("Formats acceptés : JPG, PNG, GIF ou WebP.", { type: "warning" });
             return;
         }
         if (file.size > 2 * 1024 * 1024) {
             notify("L'image doit faire moins de 2 Mo.", { type: "warning" });
             return;
         }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const result = e.target?.result;
-            if (typeof result === "string") setAvatarUrl(result);
-        };
-        reader.readAsDataURL(file);
-        if (fileInputRef.current) fileInputRef.current.value = "";
+        setUploadingAvatar(true);
+        try {
+            const dataUrl = await readFileAsDataUrl(file);
+            const uploaded = await mediaApi.uploadDataUrl(dataUrl);
+            setAvatarUrl(uploaded.publicUrl);
+            notify("Photo importée. Enregistrez le profil pour confirmer.", { type: "success" });
+        } catch (err) {
+            notify(err instanceof Error ? err.message : "L'import de la photo a échoué.", { type: "error" });
+        } finally {
+            setUploadingAvatar(false);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
     };
 
     // ─── Enregistrer infos ───
@@ -103,6 +110,15 @@ export const ProfilePage = () => {
                 method: "PATCH",
                 body: JSON.stringify({ fullName, avatarUrl }),
             });
+            try {
+                const rawUser = localStorage.getItem("lurevia_admin_user");
+                if (rawUser) {
+                    const user = JSON.parse(rawUser);
+                    localStorage.setItem("lurevia_admin_user", JSON.stringify({ ...user, fullName, avatarUrl }));
+                }
+            } catch {
+                // Le profil serveur reste enregistré même si le cache local est illisible.
+            }
             notify("Profil mis à jour.", { type: "success" });
         } catch (err) {
             notify(err instanceof Error ? err.message : "Erreur.", { type: "error" });
@@ -183,6 +199,7 @@ export const ProfilePage = () => {
                             <Tooltip title="Changer l'avatar" arrow>
                                 <IconButton
                                     size="small"
+                                    disabled={uploadingAvatar}
                                     onClick={() => fileInputRef.current?.click()}
                                     sx={{
                                         position: "absolute",
@@ -197,7 +214,7 @@ export const ProfilePage = () => {
                                         "&:hover": { backgroundColor: "primary.dark" },
                                     }}
                                 >
-                                    <PhotoCameraIcon sx={{ fontSize: 14 }} />
+                                    {uploadingAvatar ? <CircularProgress size={14} color="inherit" /> : <PhotoCameraIcon sx={{ fontSize: 14 }} />}
                                 </IconButton>
                             </Tooltip>
                             <input
