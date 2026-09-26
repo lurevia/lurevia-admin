@@ -76,6 +76,7 @@ export const SmartSelect = ({
   clearable = true,
   disableSearch = false,
 }: SmartSelectProps) => {
+    const FilterIcon = normalizeMuiIcon(Icon);
   const [open, setOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
 
@@ -143,7 +144,7 @@ export const SmartSelect = ({
                   position="start"
                   sx={{ mr: 0.5, minWidth: 20, justifyContent: "center" }}
                 >
-                  <Icon
+                  <FilterIcon
                     sx={{
                       fontSize: 16,
                       color: isActive ? "primary.main" : iconColor,
@@ -157,7 +158,7 @@ export const SmartSelect = ({
         />
       )}
       renderOption={(props, option: SmartSelectOption) => {
-        const OptionIcon = option.icon;
+        const OptionIcon = option.icon ? normalizeMuiIcon(option.icon) : null;
         const isSelected = option.value === value;
         return (
           <Box

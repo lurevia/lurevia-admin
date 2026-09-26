@@ -25,9 +25,14 @@ export const LureviaLayout = (props: LayoutProps) => (
         overflowY: "auto",
         overscrollBehavior: "contain",
       },
-      "& .RaSidebar-root .MuiDrawer-paper": {
+      "& .RaSidebar-paper": {
         padding: 0,
         overflowX: "hidden",
+      },
+      "& .RaSidebar-fixed": {
+        width: 240,
+        minWidth: 240,
+        boxSizing: "border-box",
       },
       }}
     />

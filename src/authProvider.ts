@@ -1,5 +1,12 @@
+import {
+  API_URL,
+  clearAdminSession,
+  clearAccessToken,
+  getAccessToken,
+  refreshAccessToken,
+  setAccessToken,
+} from "./httpClient";
 import type { AuthProvider } from "react-admin";
-import { API_URL, clearAccessToken, getAccessToken, setAccessToken } from "./httpClient";
 
 const USER_KEY = "lurevia_admin_user";
 
@@ -50,15 +57,19 @@ export const authProvider: AuthProvider = {
   },
 
   async checkAuth() {
-    if (!getAccessToken()) throw new Error("Authentification requise");
+    if (getAccessToken()) return;
+    const token = await refreshAccessToken();
+    if (!token) throw new Error("Session expirée. Reconnectez-vous.");
   },
 
   async checkError(error) {
     const status = (error as { status?: number })?.status;
-    if (status === 401 || status === 403) {
-      clearAccessToken();
-      localStorage.removeItem(USER_KEY);
-      throw new Error("Session expirée");
+    if (status === 401) {
+      clearAdminSession();
+      throw new Error("Session expirée. Reconnectez-vous.");
+    }
+    if (status === 403) {
+      throw new Error("Accès refusé.");
     }
   },
 

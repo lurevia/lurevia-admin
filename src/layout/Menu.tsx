@@ -152,7 +152,10 @@ const getActiveLabel = (pathname: string): string => {
 // ─── Styles ───
 const MenuContainer = styled(Box)(({ theme }) => ({
   width: "100%",
+  minWidth: 0,
   height: "100%",
+  flex: "1 1 auto",
+  alignSelf: "stretch",
   display: "flex",
   flexDirection: "column",
   backgroundColor: theme.palette.background.paper,
