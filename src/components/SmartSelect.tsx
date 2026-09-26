@@ -7,7 +7,10 @@ import {
   Typography,
 } from "@mui/material";
 import type { SvgIconComponent } from "@mui/icons-material";
-import CheckIcon from "@mui/icons-material/Check";
+import CheckIconModule from "@mui/icons-material/Check";
+import { normalizeMuiIcon } from "../muiIcon";
+
+const CheckIcon = normalizeMuiIcon(CheckIconModule);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
