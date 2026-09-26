@@ -2,10 +2,8 @@ import { fetchUtils, HttpError } from "react-admin";
 
 const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
 
-// Keep the deployed admin usable even when the Pages repository variable was
-// not configured yet. The workflow still injects VITE_API_URL when available.
 export const API_URL = (
-  configuredApiUrl || "https://lurevia-ecommerce.onrender.com/api/v1"
+  configuredApiUrl || "http://localhost:4000/api/v1"
 ).replace(/\/+$/, "");
 const ACCESS_TOKEN_KEY = "lurevia_admin_access_token";
 
