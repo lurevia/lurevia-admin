@@ -34,6 +34,7 @@ import BarChartIconModule from "@mui/icons-material/BarChart";
 import AdminPanelSettingsIconModule from "@mui/icons-material/AdminPanelSettings";
 import type { SvgIconComponent } from "@mui/icons-material";
 import { normalizeMuiIcon } from "../muiIcon";
+import { useMenuCollapse } from "./MenuCollapseContext";
 
 // ─── Icônes normalisées ───
 const MenuOpenIcon = normalizeMuiIcon(MenuOpenIconModule);
@@ -56,14 +57,7 @@ const SwapHorizIcon = normalizeMuiIcon(SwapHorizIconModule);
 const BarChartIcon = normalizeMuiIcon(BarChartIconModule);
 const AdminPanelSettingsIcon = normalizeMuiIcon(AdminPanelSettingsIconModule);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CONSTANTES
-// ─────────────────────────────────────────────────────────────────────────────
-
-const STORAGE_KEY = "lurevia-admin-menu-collapsed";
 const STORAGE_OPEN_KEY = "lurevia-admin-menu-open-categories";
-const RAIL_WIDTH = 72;
-const EXPANDED_WIDTH = 240;
 
 interface MenuItemConfig {
   to: string;
@@ -125,10 +119,6 @@ const MENU_CATEGORIES: MenuCategoryConfig[] = [
   },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
-
 const matchesPath = (pathname: string, to: string) => {
   if (to === "/") return pathname === "/";
   return pathname === to || pathname.startsWith(to + "/");
@@ -143,7 +133,6 @@ const findActiveCategoryId = (pathname: string): string | null => {
   return null;
 };
 
-// sx pour l'en-tête de catégorie
 const categoryHeaderSx = (collapsed: boolean) => ({
   borderRadius: 1,
   margin: "2px 8px",
@@ -158,7 +147,6 @@ const categoryHeaderSx = (collapsed: boolean) => ({
   },
 }) as const;
 
-// sx pour un item de menu (lien)
 const itemLinkSx = (active: boolean) => ({
   borderRadius: 1,
   margin: "2px 8px 2px 20px",
@@ -171,24 +159,14 @@ const itemLinkSx = (active: boolean) => ({
   }),
 }) as const;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STYLES STRUCTURELS
-// ─────────────────────────────────────────────────────────────────────────────
-
-const MenuContainer = styled(Box, {
-  shouldForwardProp: (prop) => prop !== "collapsed",
-})<{ collapsed: boolean }>(({ theme, collapsed }) => ({
-  width: collapsed ? RAIL_WIDTH : EXPANDED_WIDTH,
-  minWidth: collapsed ? RAIL_WIDTH : EXPANDED_WIDTH,
+const MenuContainer = styled(Box)({
+  // ✅ On prend 100% de la largeur du Drawer parent.
+  width: "100%",
   height: "100%",
   display: "flex",
   flexDirection: "column",
   overflow: "hidden",
-  transition: theme.transitions.create(["width", "min-width"], {
-    duration: theme.transitions.duration.standard,
-    easing: theme.transitions.easing.easeInOut,
-  }),
-}));
+});
 
 const MenuHeader = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -231,19 +209,11 @@ const FooterArea = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
 }));
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPOSANT
-// ─────────────────────────────────────────────────────────────────────────────
-
 export const LureviaMenu = () => {
   const location = useLocation();
   const logout = useLogout();
   const { identity } = useGetIdentity();
-
-  const [collapsed, setCollapsed] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem(STORAGE_KEY) === "true";
-  });
+  const { collapsed, toggle, isMobile } = useMenuCollapse();
 
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(() => {
     if (typeof window === "undefined") return {};
@@ -254,12 +224,6 @@ export const LureviaMenu = () => {
       return {};
     }
   });
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_KEY, String(collapsed));
-    }
-  }, [collapsed]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -276,23 +240,17 @@ export const LureviaMenu = () => {
     }
   }, [location.pathname]);
 
-  const toggleCollapsed = () => setCollapsed((prev) => !prev);
-
   const toggleCategory = (id: string) => {
-    if (collapsed) setCollapsed(false);
     setOpenCategories((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleLogout = () => {
-    logout();
-  };
+  const handleLogout = () => logout();
 
   const initial = identity?.fullName?.charAt(0).toUpperCase() ?? "?";
   const displayName = identity?.fullName ?? "Utilisateur";
 
   return (
-    <MenuContainer collapsed={collapsed}>
-      {/* ═══════ HEADER ═══════ */}
+    <MenuContainer>
       <MenuHeader>
         {!collapsed ? (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, overflow: "hidden" }}>
@@ -312,28 +270,29 @@ export const LureviaMenu = () => {
           <LogoBox>L</LogoBox>
         )}
 
-        <Tooltip title={collapsed ? "Déployer le menu" : "Réduire le menu"} arrow>
-          <IconButton
-            size="small"
-            onClick={toggleCollapsed}
-            sx={{
-              ml: collapsed ? 0 : "auto",
-              color: "text.secondary",
-              "&:hover": { color: "primary.main" },
-            }}
-            aria-label={collapsed ? "Déployer le menu" : "Réduire le menu"}
-          >
-            {collapsed ? <MenuIcon fontSize="small" /> : <MenuOpenIcon fontSize="small" />}
-          </IconButton>
-        </Tooltip>
+        {/* Le toggle n'a de sens que sur desktop */}
+        {!isMobile && (
+          <Tooltip title={collapsed ? "Déployer le menu" : "Réduire le menu"} arrow>
+            <IconButton
+              size="small"
+              onClick={toggle}
+              sx={{
+                ml: collapsed ? 0 : "auto",
+                color: "text.secondary",
+                "&:hover": { color: "primary.main" },
+              }}
+              aria-label={collapsed ? "Déployer le menu" : "Réduire le menu"}
+            >
+              {collapsed ? <MenuIcon fontSize="small" /> : <MenuOpenIcon fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+        )}
       </MenuHeader>
 
       <Divider />
 
-      {/* ═══════ ZONE SCROLLABLE ═══════ */}
       <ScrollArea>
         <List disablePadding sx={{ pt: 1, pb: 1 }}>
-          {/* Tableau de bord */}
           <Tooltip title={collapsed ? "Tableau de bord" : ""} placement="right" arrow>
             <ListItemButton
               component={Link}
@@ -360,7 +319,6 @@ export const LureviaMenu = () => {
 
           <Divider sx={{ mx: 2, my: 1.5 }} />
 
-          {/* Catégories */}
           {MENU_CATEGORIES.map((category) => {
             const CategoryIcon = category.icon;
             const isOpen = !!openCategories[category.id];
@@ -370,11 +328,7 @@ export const LureviaMenu = () => {
 
             return (
               <Box key={category.id}>
-                <Tooltip
-                  title={collapsed ? category.label : ""}
-                  placement="right"
-                  arrow
-                >
+                <Tooltip title={collapsed ? category.label : ""} placement="right" arrow>
                   <ListItemButton
                     onClick={() => toggleCategory(category.id)}
                     sx={{
@@ -446,7 +400,6 @@ export const LureviaMenu = () => {
         </List>
       </ScrollArea>
 
-      {/* ═══════ FOOTER ═══════ */}
       <FooterArea>
         <Tooltip title={collapsed ? `${displayName} — Se déconnecter` : ""} placement="right" arrow>
           <ListItemButton
