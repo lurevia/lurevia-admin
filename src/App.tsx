@@ -70,10 +70,8 @@ const i18nProvider = polyglotI18nProvider(
   resolveBrowserLocale("fr")
 );
 
-/**
- * Wrapper qui consomme le thème dynamique du contexte et l'applique à Admin.
- * Doit être un enfant du ThemeCustomizerProvider pour accéder au hook.
- */
+const VITE_API_URL = import.meta.env.VITE_API_URL || "https://lurevia-ecommerce.onrender.com/api/v1";
+
 const ThemedAdmin = () => {
   const { config } = useThemeCustomizer();
   const theme = useMemo(() => buildTheme(config), [config]);

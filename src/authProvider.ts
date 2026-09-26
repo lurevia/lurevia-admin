@@ -32,9 +32,6 @@ export const authProvider: AuthProvider = {
     }
 
     const { user, accessToken } = body.data as { user: StoredUser; accessToken: string };
-
-    // Le back-office est réservé aux comptes ADMIN — un client normal ne
-    // doit jamais pouvoir s'y connecter, même avec des identifiants valides.
     if (user.role !== "ADMIN") {
       throw new Error("Ce compte n'a pas accès à l'espace admin.");
     }
@@ -47,7 +44,6 @@ export const authProvider: AuthProvider = {
     try {
       await fetch(`${API_URL}/auth/logout`, { method: "POST", credentials: "include" });
     } catch {
-      // La déconnexion locale doit réussir même si l'appel réseau échoue.
     }
     clearAccessToken();
     localStorage.removeItem(USER_KEY);
