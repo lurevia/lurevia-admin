@@ -10,20 +10,16 @@ import {
     Tooltip,
     Typography,
 } from "@mui/material";
-import {
-    Logout as LogoutIcon,
-    Person as PersonIcon,
-    Settings as SettingsIcon,
-} from "@mui/icons-material";
+import LogoutIconModule from "@mui/icons-material/Logout";
+import PersonIconModule from "@mui/icons-material/Person";
+import SettingsIconModule from "@mui/icons-material/Settings";
 import { useGetIdentity, useLogout, useTranslate } from "react-admin";
 import { useNavigate } from "react-router-dom";
+import { normalizeMuiIcon } from "../muiIcon";
 
-interface Identity {
-    id: string | number;
-    fullName?: string;
-    avatar?: string;
-    email?: string;
-}
+const LogoutIcon = normalizeMuiIcon(LogoutIconModule);
+const PersonIcon = normalizeMuiIcon(PersonIconModule);
+const SettingsIcon = normalizeMuiIcon(SettingsIconModule);
 
 
 export const LureviaUserMenu = () => {
