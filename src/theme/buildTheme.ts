@@ -39,7 +39,6 @@ export function buildTheme(config: ThemeConfig): RaThemeOptions {
     const sidebarActiveText =
         sidebarStyle === "light" ? primary : "#FFFFFF";
 
-    // ─── Thème MUI de base (fusionne avec les valeurs par défaut MUI) ───
     const muiBase = createTheme({
         palette: {
             mode,
@@ -63,7 +62,6 @@ export function buildTheme(config: ThemeConfig): RaThemeOptions {
         shape: { borderRadius },
     });
 
-    // ─── Overrides React-admin (hors typage strict) ───
     const raOverrides = {
         RaDatagrid: {
             styleOverrides: {
@@ -141,7 +139,6 @@ export function buildTheme(config: ThemeConfig): RaThemeOptions {
         },
     };
 
-    // ─── Thème final ───
     return {
         ...defaultTheme,
         palette: muiBase.palette,
@@ -152,7 +149,6 @@ export function buildTheme(config: ThemeConfig): RaThemeOptions {
             ...defaultTheme.components,
             ...muiBase.components,
 
-            // ─── Composants MUI ───
             MuiCssBaseline: {
                 styleOverrides: { body: { backgroundColor: background } },
             },
@@ -214,7 +210,6 @@ export function buildTheme(config: ThemeConfig): RaThemeOptions {
 
             MuiTextField: { defaultProps: { size: "small" } },
 
-            // ─── Composants React-admin (cast nécessaire) ───
             ...(raOverrides as any),
         },
     };

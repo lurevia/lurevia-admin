@@ -1,11 +1,7 @@
 import type { DataProvider, GetListParams, RaRecord } from "react-admin";
 import { API_URL, httpClient } from "./httpClient";
 
-// Ressources qui vivent sous /admin/* plutôt qu'à la racine de l'API —
-// ce sont les vues transverses réservées au back-office (toutes les
-// commandes, tous les utilisateurs, modération des avis, demandes de
-// suppression), par opposition au catalogue public (produits, catégories)
-// qui reste exposé aux mêmes endpoints que la boutique.
+
 const ADMIN_SCOPED = new Set([
   "orders",
   "users",
@@ -13,8 +9,6 @@ const ADMIN_SCOPED = new Set([
   "deletion-requests",
   "profile-change-requests",
   "verifications",
-  // Financial resources live behind the admin namespace and use the same
-  // pagination/auth/error conventions as the existing admin resources.
   "sellers",
   "contracts",
   "settlements",
@@ -22,7 +16,6 @@ const ADMIN_SCOPED = new Set([
   "transfers",
 ]);
 
-// Clé sous laquelle l'API renvoie une ressource unique (create/update/getOne).
 const SINGULAR_KEY: Record<string, string> = {
   products: "product",
   categories: "category",
@@ -35,8 +28,6 @@ const SINGULAR_KEY: Record<string, string> = {
   transfers: "transfer",
 };
 
-// Catégories : l'API ne pagine pas côté serveur (petit catalogue) et
-// n'expose pas de lecture par id — tout se fait en mémoire côté client.
 const CLIENT_SIDE_RESOURCES = new Set(["categories"]);
 
 const baseUrl = (resource: string) =>
@@ -139,9 +130,6 @@ export const dataProvider: DataProvider = {
   },
 
   async update(resource, params) {
-    // Les commandes et les utilisateurs ne s'éditent pas en PATCH générique :
-    // seul un sous-ensemble précis de champs est modifiable, via des routes
-    // dédiées côté API (statut de commande, rôle utilisateur).
     if (resource === "orders") {
       const { json } = await httpClient(`${API_URL}/orders/${params.id}/status`, {
         method: "PATCH",

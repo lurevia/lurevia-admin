@@ -13,13 +13,6 @@ export const getAccessToken = (): string | null => localStorage.getItem(ACCESS_T
 export const setAccessToken = (token: string): void => localStorage.setItem(ACCESS_TOKEN_KEY, token);
 export const clearAccessToken = (): void => localStorage.removeItem(ACCESS_TOKEN_KEY);
 
-/**
- * Enveloppe fetchUtils.fetchJson de react-admin :
- * - ajoute l'en-tête Authorization avec le token en mémoire
- * - transmet les cookies (nécessaires au refresh token httpOnly)
- * - convertit les erreurs API `{ message, code }` au format attendu par
- *   react-admin (HttpError), pour un affichage propre des messages serveur.
- */
 export const httpClient = async (url: string, options: fetchUtils.Options = {}) => {
   const headers = new Headers(options.headers ?? { Accept: "application/json" });
   const token = getAccessToken();
