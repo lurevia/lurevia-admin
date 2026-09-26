@@ -27,16 +27,19 @@ export function buildTheme(config: ThemeConfig): RaThemeOptions {
         sidebarStyle === "dark" ? (mode === "dark" ? "#0A0F1F" : "#0A1B3D") :
             sidebarStyle === "accent" ? primary :
                 surface;
+
     const sidebarText =
         sidebarStyle === "light" ? textPrimary : "#E6EDF7";
+
     const sidebarActiveBg =
         sidebarStyle === "light" ? primarySubtle :
             sidebarStyle === "accent" ? "rgba(255,255,255,0.16)" :
                 "rgba(255,255,255,0.08)";
+
     const sidebarActiveText =
         sidebarStyle === "light" ? primary : "#FFFFFF";
 
-    // 1️⃣ Create a valid base MUI theme using createTheme to properly hydrate grey, error, common, action, etc.
+    // ─── Thème MUI de base (fusionne avec les valeurs par défaut MUI) ───
     const muiBase = createTheme({
         palette: {
             mode,
@@ -60,7 +63,85 @@ export function buildTheme(config: ThemeConfig): RaThemeOptions {
         shape: { borderRadius },
     });
 
-    // 2️⃣ Merge your options securely with React-Admin base defaults
+    // ─── Overrides React-admin (hors typage strict) ───
+    const raOverrides = {
+        RaDatagrid: {
+            styleOverrides: {
+                root: {
+                    "& .RaDatagrid-headerCell": {
+                        backgroundColor: mode === "dark"
+                            ? darken(surface, 4)
+                            : subtleBackground(primary, 97),
+                        fontWeight: 700,
+                        color: textPrimary,
+                        padding: d.cellPadding,
+                    },
+                    "& .RaDatagrid-row": { height: d.rowHeight },
+                    "& .RaDatagrid-row:hover": { backgroundColor: primarySubtle },
+                },
+            },
+        },
+
+        RaMenu: {
+            styleOverrides: {
+                root: {
+                    "& .MuiList-root": { paddingTop: 0 },
+                },
+            },
+        },
+
+        RaMenuItemLink: {
+            styleOverrides: {
+                root: {
+                    borderRadius: Math.max(4, borderRadius - 2),
+                    margin: "2px 8px",
+                    paddingLeft: 12,
+                    paddingRight: 12,
+                    minHeight: 40,
+                    color: sidebarStyle === "light"
+                        ? textSecondary
+                        : "rgba(255,255,255,0.75)",
+                    transition: "background-color 0.15s ease, color 0.15s ease",
+
+                    "& .MuiListItemIcon-root": {
+                        color: "inherit",
+                        minWidth: 32,
+                    },
+
+                    "& .RaMenuItemLink-label": {
+                        fontSize: 13.5,
+                        fontWeight: 500,
+                        whiteSpace: "nowrap",
+                        transition: "opacity 0.2s ease",
+                    },
+
+                    "&:hover": {
+                        backgroundColor: sidebarActiveBg,
+                        color: sidebarActiveText,
+                    },
+
+                    "&.RaMenuItemLink-active": {
+                        backgroundColor: sidebarActiveBg,
+                        color: sidebarActiveText,
+                        fontWeight: 700,
+
+                        "& .RaMenuItemLink-label": { fontWeight: 700 },
+                        "& .MuiListItemIcon-root": { color: sidebarActiveText },
+                    },
+                },
+            },
+        },
+
+        RaSidebar: {
+            styleOverrides: {
+                root: {
+                    "& .MuiDrawer-paper": { backgroundColor: sidebarBg },
+                },
+            },
+        },
+    };
+
+    // ─── Thème final ───
     return {
         ...defaultTheme,
         palette: muiBase.palette,
@@ -71,6 +152,7 @@ export function buildTheme(config: ThemeConfig): RaThemeOptions {
             ...defaultTheme.components,
             ...muiBase.components,
 
+            // ─── Composants MUI ───
             MuiCssBaseline: {
                 styleOverrides: { body: { backgroundColor: background } },
             },
@@ -132,47 +214,8 @@ export function buildTheme(config: ThemeConfig): RaThemeOptions {
 
             MuiTextField: { defaultProps: { size: "small" } },
 
-            // Bypassing the strict literal component type constraint for custom Ra components
-            ...({
-                RaDatagrid: {
-                    styleOverrides: {
-                        root: {
-                            "& .RaDatagrid-headerCell": {
-                                backgroundColor: mode === "dark"
-                                    ? darken(surface, 4)
-                                    : subtleBackground(primary, 97),
-                                fontWeight: 700,
-                                color: textPrimary,
-                                padding: d.cellPadding,
-                            },
-                            "& .RaDatagrid-row": { height: d.rowHeight },
-                            "& .RaDatagrid-row:hover": { backgroundColor: primarySubtle },
-                        },
-                    },
-                },
-
-                RaMenuItemLink: {
-                    styleOverrides: {
-                        root: {
-                            borderRadius: Math.max(4, borderRadius - 2),
-                            margin: "2px 8px",
-                            color: sidebarText,
-                            "&:hover": { backgroundColor: sidebarActiveBg },
-                            "&.RaMenuItemLink-active": {
-                                backgroundColor: sidebarActiveBg,
-                                color: sidebarActiveText,
-                                fontWeight: 700,
-                        },
-                    },
-                },
-            },
-
-            RaSidebar: {
-                    styleOverrides: {
-                        root: { "& .MuiDrawer-paper": { backgroundColor: sidebarBg } },
-                    },
-                },
-            } as any),
+            // ─── Composants React-admin (cast nécessaire) ───
+            ...(raOverrides as any),
         },
     };
 }
