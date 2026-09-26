@@ -1,4 +1,4 @@
-import { List, useListContext, useRedirect, useGetList, Title } from "react-admin";
+import { List, useListContext, useRedirect, Title } from "react-admin";
 import { useState } from "react";
 import {
   Box,
@@ -560,31 +560,6 @@ const CategoryGrid = () => {
     (filterValues.productCount as string) ?? ""
   );
 
-  // ─── Récupération de tous les produits pour compter par catégorie ───
-  const { data: products } = useGetList("products", {
-    pagination: { page: 1, perPage: 1000 },
-  });
-
-  // ─── Map catégorieId → nombre de produits ───
-  const productCountByCategory = new Map<string, number>();
-  if (products) {
-    for (const product of products) {
-      const categoryIds: string[] = Array.isArray(product.categoryIds)
-        ? product.categoryIds
-        : Array.isArray(product.categories)
-          ? product.categories.map((c: any) =>
-              typeof c === "string" ? c : c.id
-            )
-          : [];
-      for (const catId of categoryIds) {
-        productCountByCategory.set(
-          catId,
-          (productCountByCategory.get(catId) ?? 0) + 1
-        );
-      }
-    }
-  }
-
   const hasActiveFilters =
     Boolean(searchValue) ||
     Boolean(productCountFilter);
@@ -592,7 +567,7 @@ const CategoryGrid = () => {
   // ─── Filtre côté client par nombre de produits (fallback) ───
   const filteredCategories = (categories ?? []).filter((cat: any) => {
     if (!productCountFilter) return true;
-    const count = productCountByCategory.get(cat.id) ?? 0;
+    const count = cat.productCount ?? 0;
     if (productCountFilter === "empty") return count === 0;
     if (productCountFilter === "few") return count >= 1 && count <= 5;
     if (productCountFilter === "many") return count > 5;
@@ -779,7 +754,7 @@ const CategoryGrid = () => {
               <CategoryCard
                 key={record.id}
                 record={record}
-                productCount={productCountByCategory.get(record.id) ?? 0}
+                productCount={record.productCount ?? 0}
                 onOpen={() => handleOpen(record.id)}
                 onEdit={() => handleEdit(record.id)}
                 onDelete={() => handleDelete(record.id)}

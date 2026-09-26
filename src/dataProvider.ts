@@ -35,7 +35,7 @@ const baseUrl = (resource: string) =>
     ? ["contracts", "settlements", "transfers"].includes(resource)
       ? `${API_URL}/admin/financial/${resource}`
       : resource === "commissions"
-        ? `${API_URL}/admin/financial/settlements`
+        ? `${API_URL}/admin/financial/commissions`
         : `${API_URL}/admin/${resource}`
     : `${API_URL}/${resource}`;
 
@@ -69,7 +69,7 @@ export const dataProvider: DataProvider = {
       const { json } = await httpClient(baseUrl(resource));
       let items: RaRecord[] = (json.data.categories ?? []) as RaRecord[];
 
-      const q = (params.filter?.q as string | undefined)?.toLowerCase();
+      const q = ((params.filter?.search ?? params.filter?.q) as string | undefined)?.toLowerCase();
       if (q) items = items.filter((i) => String(i.name ?? "").toLowerCase().includes(q));
 
       items = sortRecords(items, params.sort);
