@@ -510,7 +510,7 @@ export const ProfileChangeDetailDialog = ({ open, onClose, record }: Props) => {
 
         {isPending && (
           <Stack direction="row" spacing={1}>
-            <ProfileChangeActions />
+            <ProfileChangeActions record={record} />
           </Stack>
         )}
       </DialogActions>

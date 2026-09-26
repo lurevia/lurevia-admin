@@ -4,10 +4,12 @@ import PaletteIconModule from "@mui/icons-material/Palette";
 import { NotificationBell } from "./NotificationBell";
 import { LureviaUserMenu } from "./UserMenu";
 import { normalizeMuiIcon } from "../muiIcon";
+import { useNavigate } from "react-router-dom";
 
 const PaletteIcon = normalizeMuiIcon(PaletteIconModule);
 
 export const LureviaAppBar = () => {
+  const navigate = useNavigate();
   return (
     <AppBar elevation={0} userMenu={<LureviaUserMenu />}>
       <TitlePortal />
@@ -16,7 +18,12 @@ export const LureviaAppBar = () => {
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <NotificationBell />
         <Tooltip title="Personnaliser le thème" arrow>
-          <IconButton size="small" color="inherit" aria-label="Personnaliser le thème">
+          <IconButton
+            size="small"
+            color="inherit"
+            aria-label="Personnaliser le thème"
+            onClick={() => navigate("/my-profile?tab=theme")}
+          >
             <PaletteIcon fontSize="small" />
           </IconButton>
         </Tooltip>

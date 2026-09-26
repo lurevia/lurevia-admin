@@ -393,8 +393,8 @@ export const DeletionRequestDetailDialog = ({ open, onClose, record }: Props) =>
 
         {isPending && (
           <Stack direction="row" spacing={1}>
-            <DeletionRequestActions variant="reject" />
-            <DeletionRequestActions variant="approve" />
+            <DeletionRequestActions record={record} variant="reject" />
+            <DeletionRequestActions record={record} variant="approve" />
           </Stack>
         )}
       </DialogActions>

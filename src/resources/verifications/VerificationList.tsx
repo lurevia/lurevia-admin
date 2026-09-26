@@ -38,6 +38,7 @@ import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import CheckIconModule from "@mui/icons-material/Check";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { VerificationActions } from "./VerificationActions";
 import { VerificationDetailDialog } from "./VerificationDetailDialog";
@@ -312,7 +313,7 @@ const VerificationCard = ({ record, onView }: any) => {
         {/* Actions si en attente */}
         {isPending ? (
           <Stack direction="row" spacing={0.5}>
-            <VerificationActions />
+            <VerificationActions record={record} />
           </Stack>
         ) : (
           // Bouton "Valider" (ou état non-pending) : simple indicateur textuel
@@ -790,7 +791,7 @@ const VerificationGrid = () => {
             total={total ?? 0}
             onPageChange={(p: number) => {
               setPage(p);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              scrollAdminContentToTop();
             }}
             onPerPageChange={(pp: number) => {
               setPerPage(pp);

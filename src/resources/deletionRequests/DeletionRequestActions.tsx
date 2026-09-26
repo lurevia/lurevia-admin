@@ -32,12 +32,15 @@ const WarningIcon = normalizeMuiIcon(WarningAmberIconModule);
 
 interface DeletionRequestActionsProps {
   variant: "approve" | "reject";
+  record?: any;
 }
 
 export const DeletionRequestActions = ({
   variant,
+  record: recordProp,
 }: DeletionRequestActionsProps) => {
-  const record = useRecordContext();
+  const contextRecord = useRecordContext();
+  const record = recordProp ?? contextRecord;
   const notify = useNotify();
   const refresh = useRefresh();
   const [open, setOpen] = useState(false);

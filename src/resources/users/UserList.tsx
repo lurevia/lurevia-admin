@@ -49,6 +49,7 @@ import TransgenderIconModule from "@mui/icons-material/Transgender";
 import AdminPanelSettingsIconModule from "@mui/icons-material/AdminPanelSettings";
 import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { UserDetailDialog } from "./UserDetailDialog";
 
@@ -856,7 +857,7 @@ const UserGrid = () => {
             total={total ?? 0}
             onPageChange={(p: number) => {
               setPage(p);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              scrollAdminContentToTop();
             }}
             onPerPageChange={(pp: number) => {
               setPerPage(pp);

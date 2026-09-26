@@ -39,6 +39,7 @@ interface VerificationActionsProps {
   /** Affiche un bouton unique (approve ou reject) ou les deux. */
   variant?: "approve" | "reject";
   showBoth?: boolean;
+  record?: any;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -48,8 +49,10 @@ interface VerificationActionsProps {
 export const VerificationActions = ({
   variant,
   showBoth = true,
+  record: recordProp,
 }: VerificationActionsProps) => {
-  const record = useRecordContext<any>();
+  const contextRecord = useRecordContext<any>();
+  const record = recordProp ?? contextRecord;
   const notify = useNotify();
   const refresh = useRefresh();
 
@@ -83,7 +86,7 @@ export const VerificationActions = ({
     try {
       if (approved) {
         await approveVerification(record.id);
-        notify("Compte approuvé. Un code a été généré et envoyé.", {
+        notify("Compte approuvé et fonctionnalités activées.", {
           type: "success",
         });
       } else {
@@ -188,9 +191,9 @@ export const VerificationActions = ({
                   : "Rejeter la demande"}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {approved
-                  ? "Un code sera généré et envoyé à l'utilisateur."
-                  : "L'utilisateur ne pourra pas finaliser sa vérification."}
+                  {approved
+                    ? "Le compte sera activé immédiatement et l'utilisateur recevra une notification."
+                    : "L'utilisateur ne pourra pas finaliser sa vérification."}
               </Typography>
             </Box>
           </Stack>
@@ -250,9 +253,8 @@ export const VerificationActions = ({
                 "& .MuiAlert-message": { fontSize: 12.5, lineHeight: 1.5 },
               }}
             >
-              En approuvant, un <strong>code à 6 chiffres</strong> sera
-              automatiquement généré et envoyé à l'utilisateur. Le code
-              expirera après 24 heures.
+              En approuvant, toutes les fonctionnalités du compte seront activées
+              immédiatement et une notification sera envoyée à l'utilisateur.
             </Alert>
           )}
 

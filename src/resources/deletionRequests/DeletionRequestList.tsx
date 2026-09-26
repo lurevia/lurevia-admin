@@ -41,6 +41,7 @@ import FilterAltOffIconModule from "@mui/icons-material/FilterAltOff";
 import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { DeletionRequestActions } from "./DeletionRequestActions";
 import { DeletionRequestDetailDialog } from "./DeletionRequestDetailDialog";
@@ -308,8 +309,8 @@ const DeletionRequestCard = ({ record, onView }: any) => {
         {/* Actions approve/reject uniquement si pending */}
         {record.status === "pending" && (
           <Stack direction="row" spacing={0.5}>
-            <DeletionRequestActions variant="reject" />
-            <DeletionRequestActions variant="approve" />
+            <DeletionRequestActions record={record} variant="reject" />
+            <DeletionRequestActions record={record} variant="approve" />
           </Stack>
         )}
       </CardActions>
@@ -747,7 +748,7 @@ const DeletionGrid = () => {
             total={total ?? 0}
             onPageChange={(p: number) => {
               setPage(p);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              scrollAdminContentToTop();
             }}
             onPerPageChange={(pp: number) => {
               setPerPage(pp);

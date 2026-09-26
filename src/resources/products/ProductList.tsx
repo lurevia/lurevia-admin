@@ -51,6 +51,7 @@ import NewReleasesIconModule from "@mui/icons-material/NewReleases";
 import FilterAltOffIconModule from "@mui/icons-material/FilterAltOff";
 import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { ProductDetailDialog } from "./ProductDetailDialog";
 
@@ -1162,7 +1163,7 @@ const ProductGrid = () => {
             total={total ?? 0}
             onPageChange={(p) => {
               setPage(p);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              scrollAdminContentToTop();
             }}
             onPerPageChange={(pp) => {
               setPerPage(pp);

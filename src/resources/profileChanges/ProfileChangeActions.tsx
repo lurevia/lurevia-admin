@@ -41,8 +41,9 @@ type RecordType = {
   requestedPhone?: string;
 };
 
-export const ProfileChangeActions = () => {
-  const record = useRecordContext<RecordType>();
+export const ProfileChangeActions = ({ record: recordProp }: { record?: RecordType }) => {
+  const contextRecord = useRecordContext<RecordType>();
+  const record = recordProp ?? contextRecord;
   const notify = useNotify();
   const refresh = useRefresh();
   const [open, setOpen] = useState(false);

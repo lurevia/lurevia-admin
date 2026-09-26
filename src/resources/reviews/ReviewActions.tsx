@@ -34,13 +34,16 @@ interface ReviewActionsProps {
   variant?: "approve" | "reject";
   /** Mode : afficher les deux boutons (default) ou un seul. */
   showBoth?: boolean;
+  record?: any;
 }
 
 export const ReviewActions = ({
   variant,
   showBoth = true,
+  record: recordProp,
 }: ReviewActionsProps) => {
-  const record = useRecordContext<any>();
+  const contextRecord = useRecordContext<any>();
+  const record = recordProp ?? contextRecord;
   const notify = useNotify();
   const refresh = useRefresh();
 

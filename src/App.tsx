@@ -3,6 +3,7 @@ import { Admin, Resource, resolveBrowserLocale, CustomRoutes } from "react-admin
 import polyglotI18nProvider from "ra-i18n-polyglot";
 import frenchMessages from "ra-language-french";
 import { Route } from "react-router-dom";
+import { QueryClient } from "react-query";
 
 import InventoryIconModule from "@mui/icons-material/Inventory2";
 import CategoryIconModule from "@mui/icons-material/Category";
@@ -20,37 +21,38 @@ import SwapHorizIconModule from "@mui/icons-material/SwapHoriz";
 import { dataProvider } from "./dataProvider";
 import { authProvider } from "./authProvider";
 import { LureviaLayout } from "./layout/Layout";
-import { Dashboard } from "./dashboard/Dashboard";
-
-import { ProductList } from "./resources/products/ProductList";
-import { ProductEdit } from "./resources/products/ProductEdit";
-import { ProductCreate } from "./resources/products/ProductCreate";
-import { CategoryList } from "./resources/categories/CategoryList";
-import { CategoryEdit } from "./resources/categories/CategoryEdit";
-import { CategoryCreate } from "./resources/categories/CategoryCreate";
-import { OrderList } from "./resources/orders/OrderList";
-import { OrderEdit } from "./resources/orders/OrderEdit";
-import { UserList } from "./resources/users/UserList";
-import { UserEdit } from "./resources/users/UserEdit";
-import { ReviewList } from "./resources/reviews/ReviewList";
-import { DeletionRequestList } from "./resources/deletionRequests/DeletionRequestList";
-import { ProfileChangeList } from "./resources/profileChanges/ProfileChangeList";
-import { VerificationList } from "./resources/verifications/VerificationList";
-import { AdminMessagePage } from "./resources/messages/AdminMessagePage";
-import { AdminCreate } from "./resources/admins/AdminCreate";
-import {
-  SellersList,
-  ContractsList,
-  SettlementsList,
-  CommissionsList,
-  TransfersList,
-} from "./resources/finance/FinanceResources";
-import { FinancialDashboard } from "./resources/finance/FinancialDashboard";
-import { LureviaLoginPage } from "./auth/LoginPage";
 import { normalizeMuiIcon } from "./muiIcon";
 
 import { ThemeCustomizerProvider, useThemeCustomizer } from "./theme/ThemeCustomizerContext";
 import { buildTheme } from "./theme/buildTheme";
+import {
+  AdminCreatePage,
+  AdminMessage,
+  CategoryCreatePage,
+  CategoryEditPage,
+  CategoryListPage,
+  CommissionsPage,
+  ContractsPage,
+  DashboardPage,
+  DeletionRequestListPage,
+  FinancialDashboardPage,
+  LoginPage,
+  OrderEditPage,
+  OrderListPage,
+  ProductCreatePage,
+  ProductEditPage,
+  ProductListPage,
+  ProfileChangeListPage,
+  ProfileRoute,
+  ReviewListPage,
+  SellersPage,
+  SettingsRoute,
+  SettlementsPage,
+  TransfersPage,
+  UserEditPage,
+  UserListPage,
+  VerificationListPage,
+} from "./adminPages";
 
 const InventoryIcon = normalizeMuiIcon(InventoryIconModule);
 const CategoryIcon = normalizeMuiIcon(CategoryIconModule);
@@ -70,7 +72,15 @@ const i18nProvider = polyglotI18nProvider(
   resolveBrowserLocale("fr")
 );
 
-const VITE_API_URL = import.meta.env.VITE_API_URL || "https://lurevia-ecommerce.onrender.com/api/v1";
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 20_000,
+      cacheTime: 300_000,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const ThemedAdmin = () => {
   const { config } = useThemeCustomizer();
@@ -80,57 +90,60 @@ const ThemedAdmin = () => {
     <Admin
       title="Lurevia — Espace Admin"
       dataProvider={dataProvider}
+      queryClient={queryClient}
       authProvider={authProvider}
       i18nProvider={i18nProvider}
       theme={theme}
       layout={LureviaLayout}
-      dashboard={Dashboard}
-      loginPage={LureviaLoginPage}
+      dashboard={DashboardPage}
+      loginPage={LoginPage}
       basename="/lurevia-admin"
       requireAuth
       disableTelemetry
     >
       <Resource
         name="products"
-        list={ProductList}
-        edit={ProductEdit}
-        create={ProductCreate}
+        list={ProductListPage}
+        edit={ProductEditPage}
+        create={ProductCreatePage}
         icon={InventoryIcon}
         options={{ label: "Produits" }}
       />
       <Resource
         name="categories"
-        list={CategoryList}
-        edit={CategoryEdit}
-        create={CategoryCreate}
+        list={CategoryListPage}
+        edit={CategoryEditPage}
+        create={CategoryCreatePage}
         icon={CategoryIcon}
         options={{ label: "Catégories" }}
       />
-      <Resource name="orders" list={OrderList} edit={OrderEdit} icon={ReceiptIcon} options={{ label: "Commandes" }} />
-      <Resource name="users" list={UserList} edit={UserEdit} icon={PeopleIcon} options={{ label: "Utilisateurs" }} />
-      <Resource name="reviews" list={ReviewList} icon={ReviewsIcon} options={{ label: "Avis" }} />
+      <Resource name="orders" list={OrderListPage} edit={OrderEditPage} icon={ReceiptIcon} options={{ label: "Commandes" }} />
+      <Resource name="users" list={UserListPage} edit={UserEditPage} icon={PeopleIcon} options={{ label: "Utilisateurs" }} />
+      <Resource name="reviews" list={ReviewListPage} icon={ReviewsIcon} options={{ label: "Avis" }} />
       <Resource
         name="deletion-requests"
-        list={DeletionRequestList}
+        list={DeletionRequestListPage}
         icon={PersonRemoveIcon}
         options={{ label: "Suppressions" }}
       />
       <Resource
         name="profile-change-requests"
-        list={ProfileChangeList}
+        list={ProfileChangeListPage}
         icon={ManageAccountsIcon}
         options={{ label: "Modifications de profil" }}
       />
-      <Resource name="verifications" list={VerificationList} icon={FactCheckIcon} options={{ label: "Vérifications" }} />
-      <Resource name="sellers" list={SellersList} icon={StorefrontIcon} options={{ label: "Vendeurs" }} />
-      <Resource name="contracts" list={ContractsList} icon={FactCheckIcon} options={{ label: "Contrats" }} />
-      <Resource name="settlements" list={SettlementsList} icon={AccountBalanceIcon} options={{ label: "Settlements" }} />
-      <Resource name="commissions" list={CommissionsList} icon={AccountBalanceIcon} options={{ label: "Commissions" }} />
-      <Resource name="transfers" list={TransfersList} icon={SwapHorizIcon} options={{ label: "Transferts" }} />
+      <Resource name="verifications" list={VerificationListPage} icon={FactCheckIcon} options={{ label: "Vérifications" }} />
+      <Resource name="sellers" list={SellersPage} icon={StorefrontIcon} options={{ label: "Vendeurs" }} />
+      <Resource name="contracts" list={ContractsPage} icon={FactCheckIcon} options={{ label: "Contrats" }} />
+      <Resource name="settlements" list={SettlementsPage} icon={AccountBalanceIcon} options={{ label: "Settlements" }} />
+      <Resource name="commissions" list={CommissionsPage} icon={AccountBalanceIcon} options={{ label: "Commissions" }} />
+      <Resource name="transfers" list={TransfersPage} icon={SwapHorizIcon} options={{ label: "Transferts" }} />
       <CustomRoutes>
-        <Route path="/messages" element={<AdminMessagePage />} />
-        <Route path="/admins/create" element={<AdminCreate />} />
-        <Route path="/financial-dashboard" element={<FinancialDashboard />} />
+        <Route path="/messages" element={<AdminMessage />} />
+        <Route path="/admins/create" element={<AdminCreatePage />} />
+        <Route path="/financial-dashboard" element={<FinancialDashboardPage />} />
+        <Route path="/configuration" element={<SettingsRoute />} />
+        <Route path="/my-profile" element={<ProfileRoute />} />
       </CustomRoutes>
     </Admin>
   );

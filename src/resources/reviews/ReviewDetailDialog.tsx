@@ -447,7 +447,7 @@ export const ReviewDetailDialog = ({ open, onClose, record }: Props) => {
           Fermer
         </Button>
 
-        {isPending && <ReviewActions />}
+        {isPending && <ReviewActions record={record} />}
       </DialogActions>
     </Dialog>
   );

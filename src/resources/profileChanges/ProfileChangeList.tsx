@@ -35,6 +35,7 @@ import CancelIconModule from "@mui/icons-material/Cancel";
 import FilterAltOffIconModule from "@mui/icons-material/FilterAltOff";
 import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { ProfileChangeActions } from "./ProfileChangeActions";
 import { ProfileChangeDetailDialog } from "./ProfileChangeDetailDialog";
@@ -324,7 +325,7 @@ const ProfileChangeCard = ({ record, onView }: any) => {
 
         {record.status === "PENDING" && (
           <Stack direction="row" spacing={0.5}>
-            <ProfileChangeActions />
+            <ProfileChangeActions record={record} />
           </Stack>
         )}
       </CardActions>
@@ -801,7 +802,7 @@ const ProfileChangeGrid = () => {
             total={total ?? 0}
             onPageChange={(p: number) => {
               setPage(p);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              scrollAdminContentToTop();
             }}
             onPerPageChange={(pp: number) => {
               setPerPage(pp);

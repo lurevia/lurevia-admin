@@ -408,7 +408,7 @@ export const VerificationDetailDialog = ({ open, onClose, record }: Props) => {
           Fermer
         </Button>
 
-        {isPending && <VerificationActions />}
+          {isPending && <VerificationActions record={record} />}
       </DialogActions>
     </Dialog>
   );

@@ -40,6 +40,7 @@ import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import MoneyIconModule from "@mui/icons-material/Paid";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { OrderDetailDialog } from "./OrderDetailDialog";
 
@@ -905,7 +906,7 @@ const OrderGrid = () => {
             total={total ?? 0}
             onPageChange={(p: number) => {
               setPage(p);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              scrollAdminContentToTop();
             }}
             onPerPageChange={(pp: number) => {
               setPerPage(pp);

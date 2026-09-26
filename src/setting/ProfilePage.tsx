@@ -32,6 +32,8 @@ import { normalizeMuiIcon } from "../muiIcon";
 import { useThemeCustomizer } from "../theme/ThemeCustomizerContext";
 import { API_URL, httpClient } from "../httpClient";
 import { PresetGallery } from "./PresetGallery";
+import { ThemeControls } from "./ThemeControls";
+import { useSearchParams } from "react-router-dom";
 
 const PhotoCameraIcon = normalizeMuiIcon(PhotoCameraIconModule);
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
@@ -46,13 +48,16 @@ const InfoIcon = normalizeMuiIcon(InfoOutlinedIconModule);
 type TabKey = "info" | "security" | "theme";
 
 export const ProfilePage = () => {
+    const [searchParams] = useSearchParams();
     const { identity } = useGetIdentity();
     const notify = useNotify();
     const logout = useLogout();
     const { config } = useThemeCustomizer();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [tab, setTab] = useState<TabKey>("info");
+    const [tab, setTab] = useState<TabKey>(() =>
+        searchParams.get("tab") === "theme" ? "theme" : "info"
+    );
     const [saving, setSaving] = useState(false);
 
     // Infos profil
@@ -480,11 +485,8 @@ export const ProfilePage = () => {
 
                             {/* Galerie de presets */}
                             <PresetGallery />
-
-                            <Alert severity="info" sx={{ borderRadius: 2 }}>
-                                💡 Pour un contrôle total (couleurs personnalisées, densité, arrondis),
-                                utilisez le bouton 🎨 dans la barre supérieure.
-                            </Alert>
+                            <Divider />
+                            <ThemeControls />
                         </Stack>
                     )}
                 </CardContent>

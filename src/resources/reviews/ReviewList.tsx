@@ -36,6 +36,7 @@ import ShoppingBagIconModule from "@mui/icons-material/ShoppingBag";
 import StarRateIconModule from "@mui/icons-material/StarRate";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { ReviewActions } from "./ReviewActions";
 import { ReviewDetailDialog } from "./ReviewDetailDialog";
@@ -352,7 +353,7 @@ const ReviewCard = ({ record, onView }: any) => {
           </IconButton>
         </Tooltip>
 
-        {isPending && <ReviewActions />}
+        {isPending && <ReviewActions record={record} />}
       </CardActions>
     </Card>
   );
@@ -817,7 +818,7 @@ const ReviewGrid = () => {
             total={total ?? 0}
             onPageChange={(p: number) => {
               setPage(p);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              scrollAdminContentToTop();
             }}
             onPerPageChange={(pp: number) => {
               setPerPage(pp);

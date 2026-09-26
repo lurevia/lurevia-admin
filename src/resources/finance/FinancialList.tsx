@@ -41,6 +41,7 @@ import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import TagIconModule from "@mui/icons-material/Tag";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { FinanceDetailDialog } from "./FinanceDetailDialog";
 
@@ -1010,7 +1011,7 @@ const FinanceGrid = ({ resource }: { resource: ResourceKey }) => {
             singular={config.singular}
             onPageChange={(p: number) => {
               setPage(p);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              scrollAdminContentToTop();
             }}
             onPerPageChange={(pp: number) => {
               setPerPage(pp);

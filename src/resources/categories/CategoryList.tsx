@@ -35,6 +35,7 @@ import FilterAltOffIconModule from "@mui/icons-material/FilterAltOff";
 import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import Inventory2IconModule from "@mui/icons-material/Inventory2";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 
 // ─── Icônes normalisées ───
@@ -768,7 +769,7 @@ const CategoryGrid = () => {
             total={total ?? 0}
             onPageChange={(p) => {
               setPage(p);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              scrollAdminContentToTop();
             }}
             onPerPageChange={(pp) => {
               setPerPage(pp);
