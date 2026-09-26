@@ -1,8 +1,11 @@
 import { AppBar, TitlePortal } from "react-admin";
 import { Box, IconButton, Tooltip } from "@mui/material";
-import PaletteIcon from "@mui/icons-material/Palette";
+import PaletteIconModule from "@mui/icons-material/Palette";
 import { NotificationBell } from "./NotificationBell";
 import { LureviaUserMenu } from "./UserMenu";
+import { normalizeMuiIcon } from "../muiIcon";
+
+const PaletteIcon = normalizeMuiIcon(PaletteIconModule);
 
 export const LureviaAppBar = () => {
   return (
