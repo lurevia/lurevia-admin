@@ -53,7 +53,6 @@ import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { UserDetailDialog } from "./UserDetailDialog";
 
-// ─── Icônes normalisées ───
 const PeopleIcon = normalizeMuiIcon(PeopleIconModule);
 const EditIcon = normalizeMuiIcon(EditOutlinedIconModule);
 const DeleteIcon = normalizeMuiIcon(DeleteOutlineIconModule);
@@ -79,9 +78,6 @@ const TransgenderIcon = normalizeMuiIcon(TransgenderIconModule);
 const AdminIcon = normalizeMuiIcon(AdminPanelSettingsIconModule);
 const ViewModuleIcon = normalizeMuiIcon(ViewModuleIconModule);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// OPTIONS
-// ─────────────────────────────────────────────────────────────────────────────
 
 const SORT_OPTIONS: SmartSelectOption[] = [
   { value: "createdAt:DESC", label: "Plus récents" },
@@ -118,9 +114,6 @@ const PER_PAGE_SELECT_OPTIONS: SmartSelectOption[] = PER_PAGE_OPTIONS.map((n) =>
   label: `${n} / page`,
 }));
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
 
 const getRoleConfig = (role: string) => {
   switch (role) {
@@ -370,9 +363,6 @@ const UserCard = ({ record, onView, onEdit, onDelete }: any) => {
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SKELETON
-// ─────────────────────────────────────────────────────────────────────────────
 
 const UserSkeleton = () => (
   <Card
@@ -398,10 +388,6 @@ const UserSkeleton = () => (
     </CardContent>
   </Card>
 );
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PAGINATION
-// ─────────────────────────────────────────────────────────────────────────────
 
 const UserPagination = ({
   page,
@@ -476,10 +462,6 @@ const UserPagination = ({
     </Paper>
   );
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BARRE DE FILTRES COMPACTE (1 SEULE LIGNE)
-// ─────────────────────────────────────────────────────────────────────────────
 
 const UserFilterBar = ({
   searchValue,
@@ -557,7 +539,6 @@ const UserFilterBar = ({
           }}
         />
 
-        {/* Tri */}
         <SmartSelect
           placeholder="Trier par…"
           icon={SortIcon}
@@ -571,7 +552,6 @@ const UserFilterBar = ({
           disableSearch
         />
 
-        {/* Rôle */}
         <SmartSelect
           placeholder="Rôle"
           icon={RoleIcon}
@@ -639,9 +619,6 @@ const UserFilterBar = ({
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GRILLE
-// ─────────────────────────────────────────────────────────────────────────────
 
 const UserGrid = () => {
   const {
@@ -881,10 +858,6 @@ const UserGrid = () => {
     </Box>
   );
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// EXPORT
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const UserList = () => (
   <List

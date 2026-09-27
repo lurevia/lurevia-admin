@@ -10,6 +10,7 @@ import {
   IconButton,
   List,
   ListItem,
+  LinearProgress,
   Skeleton,
   Stack,
   Tab,
@@ -51,6 +52,7 @@ import PieChartIconModule from "@mui/icons-material/PieChart";
 import BarChartIconModule from "@mui/icons-material/BarChart";
 import StarIconModule from "@mui/icons-material/Star";
 import RefreshIconModule from "@mui/icons-material/Refresh";
+import ShoppingCartIconModule from "@mui/icons-material/ShoppingCart";
 import { normalizeMuiIcon } from "../muiIcon";
 import { StatCard } from "./StatCard";
 import {
@@ -74,6 +76,7 @@ const PieIcon = normalizeMuiIcon(PieChartIconModule);
 const BarIcon = normalizeMuiIcon(BarChartIconModule);
 const StarIcon = normalizeMuiIcon(StarIconModule);
 const RefreshIcon = normalizeMuiIcon(RefreshIconModule);
+const ShoppingCartIcon = normalizeMuiIcon(ShoppingCartIconModule);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTES
@@ -271,6 +274,8 @@ export const Dashboard = () => {
   const pendingDeletions = stats?.pendingDeletionRequests ?? 0;
   const totalReviews = stats?.totalReviews ?? 0;
   const unreadAdmin = stats?.unreadAdminNotifications ?? 0;
+  const setupSteps = [Boolean(totalProducts), Boolean(totalUsers), Boolean(orders30dCount), Boolean(stats)];
+  const setupProgress = Math.round((setupSteps.filter(Boolean).length / setupSteps.length) * 100);
 
   const revenueSeries = stats?.revenueSeries ?? [];
   const ordersByStatus = stats?.ordersByStatus ?? [];
@@ -358,6 +363,15 @@ export const Dashboard = () => {
           </IconButton>
         </Tooltip>
       </Stack>
+
+      <Box sx={{ mb: 2.5, p: 1.75, border: "1px solid", borderColor: "divider", borderRadius: 2, backgroundColor: "background.paper" }}>
+        <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mb: 0.75 }}>
+          <ShoppingCartIcon sx={{ color: "primary.main", fontSize: 20 }} />
+          <Typography sx={{ fontWeight: 800, fontSize: 13, flex: 1 }}>Boutique prête à vendre</Typography>
+          <Typography variant="caption" color="text.secondary">{setupProgress}%</Typography>
+        </Stack>
+        <LinearProgress variant="determinate" value={setupProgress} sx={{ height: 7, borderRadius: 4 }} />
+      </Box>
 
       {error && (
         <Alert severity="warning" sx={{ mb: 2, borderRadius: 2, py: 0.5 }}>

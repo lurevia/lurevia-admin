@@ -38,6 +38,7 @@ import {
   type PlatformSettings,
 } from "../adminActions";
 import { normalizeMuiIcon } from "../muiIcon";
+import { SettingsInput } from "../components/SettingsInput";
 
 const SaveIcon = normalizeMuiIcon(SaveIconModule);
 const RefreshIcon = normalizeMuiIcon(RefreshIconModule);
@@ -319,27 +320,27 @@ export const SettingsPage = () => {
               />
 
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2.5}>
-                <TextField
+                <SettingsInput
                   label="Nom du site"
                   value={getValue("siteName")}
-                  onChange={(e) => setValue("siteName", e.target.value)}
+                  onValueChange={(value) => setValue("siteName", value)}
                   fullWidth
                   size="small"
                   required
                 />
-                <TextField
+                <SettingsInput
                   label="Slogan"
                   value={getValue("siteTagline")}
-                  onChange={(e) => setValue("siteTagline", e.target.value)}
+                  onValueChange={(value) => setValue("siteTagline", value)}
                   fullWidth
                   size="small"
                 />
               </Stack>
 
-              <TextField
+              <SettingsInput
                 label="Description"
                 value={getValue("siteDescription")}
-                onChange={(e) => setValue("siteDescription", e.target.value)}
+                onValueChange={(value) => setValue("siteDescription", value)}
                 fullWidth
                 size="small"
                 multiline
