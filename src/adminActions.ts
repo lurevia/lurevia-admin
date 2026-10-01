@@ -200,16 +200,62 @@ export interface PlatformSettings {
 }
 
 export const fetchSettings = async (): Promise<PlatformSettings> => {
-  const { json } = await httpClient(`${API_URL}/admin/settings`);
+  const { json } = await httpClient(`${API_URL}/settings/admin`);
   return json.data as PlatformSettings;
 };
 
 export const updateSettings = async (
   patch: Partial<PlatformSettings>
 ): Promise<PlatformSettings> => {
-  const { json } = await httpClient(`${API_URL}/admin/settings`, {
+  const { json } = await httpClient(`${API_URL}/settings/admin`, {
     method: "PATCH",
     body: JSON.stringify(patch),
   });
   return json.data as PlatformSettings;
+};
+
+export type SitePageSection = "NAVIGATION" | "SERVICES" | "INFORMATION";
+
+export interface SitePageRecord {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  content: string;
+  published: boolean;
+  showInFooter: boolean;
+  footerSection: SitePageSection | null;
+  updatedAt: string;
+}
+
+export type SitePageInput = Omit<SitePageRecord, "id" | "updatedAt">;
+
+export const fetchSitePages = async (): Promise<SitePageRecord[]> => {
+  const { json } = await httpClient(`${API_URL}/pages/admin`);
+  return json.data as SitePageRecord[];
+};
+
+export const createSitePage = async (
+  page: SitePageInput
+): Promise<SitePageRecord> => {
+  const { json } = await httpClient(`${API_URL}/pages/admin`, {
+    method: "POST",
+    body: JSON.stringify(page),
+  });
+  return json.data as SitePageRecord;
+};
+
+export const updateSitePage = async (
+  id: string,
+  page: SitePageInput
+): Promise<SitePageRecord> => {
+  const { json } = await httpClient(`${API_URL}/pages/admin/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(page),
+  });
+  return json.data as SitePageRecord;
+};
+
+export const deleteSitePage = async (id: string): Promise<void> => {
+  await httpClient(`${API_URL}/pages/admin/${id}`, { method: "DELETE" });
 };

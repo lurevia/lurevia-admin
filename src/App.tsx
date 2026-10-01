@@ -17,6 +17,7 @@ import ManageAccountsIconModule from "@mui/icons-material/ManageAccounts";
 import StorefrontIconModule from "@mui/icons-material/Storefront";
 import AccountBalanceIconModule from "@mui/icons-material/AccountBalance";
 import SwapHorizIconModule from "@mui/icons-material/SwapHoriz";
+import ArticleIconModule from "@mui/icons-material/Article";
 
 import { dataProvider } from "./dataProvider";
 import { authProvider } from "./authProvider";
@@ -53,6 +54,7 @@ import {
   UserListPage,
   VerificationListPage,
 } from "./adminPages";
+import { SitePagesPage } from "./pages/SitePagesPage";
 
 const InventoryIcon = normalizeMuiIcon(InventoryIconModule);
 const CategoryIcon = normalizeMuiIcon(CategoryIconModule);
@@ -66,6 +68,7 @@ const ManageAccountsIcon = normalizeMuiIcon(ManageAccountsIconModule);
 const StorefrontIcon = normalizeMuiIcon(StorefrontIconModule);
 const AccountBalanceIcon = normalizeMuiIcon(AccountBalanceIconModule);
 const SwapHorizIcon = normalizeMuiIcon(SwapHorizIconModule);
+const ArticleIcon = normalizeMuiIcon(ArticleIconModule);
 
 const i18nProvider = polyglotI18nProvider(
   () => frenchMessages,
@@ -138,6 +141,7 @@ const ThemedAdmin = () => {
       <Resource name="settlements" list={SettlementsPage} icon={AccountBalanceIcon} options={{ label: "Settlements" }} />
       <Resource name="commissions" list={CommissionsPage} icon={AccountBalanceIcon} options={{ label: "Commissions" }} />
       <Resource name="transfers" list={TransfersPage} icon={SwapHorizIcon} options={{ label: "Transferts" }} />
+      <Resource name="pages" list={SitePagesPage} icon={ArticleIcon} options={{ label: "Pages du site" }} />
       <CustomRoutes>
         <Route path="/messages" element={<AdminMessage />} />
         <Route path="/admins/create" element={<AdminCreatePage />} />

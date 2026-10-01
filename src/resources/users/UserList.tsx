@@ -159,10 +159,6 @@ const formatDate = (date: string | null | undefined) => {
   }).format(new Date(date));
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CARTE UTILISATEUR
-// ─────────────────────────────────────────────────────────────────────────────
-
 type UserCardProps = {
   record: UserRecord;
   onView: () => void;
