@@ -51,10 +51,10 @@ export const reviewProfileChange = (
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const approveVerification = (id: string) =>
-  httpClient(`${API_URL}/admin/verifications/${id}/approve`, { method: "POST" });
+  httpClient(`${API_URL}/admin/identity-verifications/${id}/approve`, { method: "POST" });
 
 export const rejectVerification = (id: string, reason?: string) =>
-  httpClient(`${API_URL}/admin/verifications/${id}/reject`, {
+  httpClient(`${API_URL}/admin/identity-verifications/${id}/reject`, {
     method: "POST",
     body: JSON.stringify({ reason }),
   });

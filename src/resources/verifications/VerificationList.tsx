@@ -76,7 +76,6 @@ const STATUS_OPTIONS: SmartSelectOption[] = [
   { value: "PENDING", label: "En attente", icon: PendingIcon },
   { value: "APPROVED", label: "Approuvées", icon: ApprovedIcon },
   { value: "REJECTED", label: "Rejetées", icon: RejectedIcon },
-  { value: "USED", label: "Utilisées", icon: UsedIcon },
   { value: "EXPIRED", label: "Expirées", icon: ExpiredIcon },
 ];
 
@@ -256,9 +255,9 @@ const VerificationCard = ({ record, onView }: any) => {
               "& .MuiChip-label": { px: 0.75 },
             }}
           />
-          {record.type && (
+          {record.isGuardian !== undefined && (
             <Typography sx={{ fontSize: 10.5, color: "text.secondary" }}>
-              {record.type}
+              {record.isGuardian ? "Vérification par tuteur" : "Vérification CIN"}
             </Typography>
           )}
         </Stack>
@@ -687,7 +686,7 @@ const VerificationGrid = () => {
             Vérifications de compte
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Approuvez ou rejetez les demandes de vérification d'identité.
+            Vérifiez manuellement les numéros CIN reçus; aucune pièce d'identité n'est téléversée.
           </Typography>
         </Box>
       </Stack>

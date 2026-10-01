@@ -1,7 +1,10 @@
 import {
   List,
+  useDelete,
   useListContext,
+  useNotify,
   useRedirect,
+  useRefresh,
   Title,
 } from "react-admin";
 import { useState } from "react";
@@ -52,6 +55,14 @@ import { normalizeMuiIcon } from "../../muiIcon";
 import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { UserDetailDialog } from "./UserDetailDialog";
+import type { UserRecord } from "./userTypes";
+
+type UserListFilters = {
+  search?: string;
+  role?: string;
+  gender?: string;
+  age?: string;
+};
 
 const PeopleIcon = normalizeMuiIcon(PeopleIconModule);
 const EditIcon = normalizeMuiIcon(EditOutlinedIconModule);
@@ -152,7 +163,14 @@ const formatDate = (date: string | null | undefined) => {
 // CARTE UTILISATEUR
 // ─────────────────────────────────────────────────────────────────────────────
 
-const UserCard = ({ record, onView, onEdit, onDelete }: any) => {
+type UserCardProps = {
+  record: UserRecord;
+  onView: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+};
+
+const UserCard = ({ record, onView, onEdit, onDelete }: UserCardProps) => {
   const roleConfig = getRoleConfig(record.role);
   const RoleIconCmp = roleConfig.icon;
   const initial = record.fullName?.charAt(0).toUpperCase() ?? "?";
@@ -463,6 +481,21 @@ const UserPagination = ({
   );
 };
 
+type UserFilterBarProps = {
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  sortValue: string;
+  onSortChange: (value: string) => void;
+  roleValue: string;
+  onRoleChange: (value: string) => void;
+  genderValue: string;
+  onGenderChange: (value: string) => void;
+  ageValue: string;
+  onAgeChange: (value: string) => void;
+  onResetFilters: () => void;
+  hasActiveFilters: boolean;
+};
+
 const UserFilterBar = ({
   searchValue,
   onSearchChange,
@@ -476,7 +509,7 @@ const UserFilterBar = ({
   onAgeChange,
   onResetFilters,
   hasActiveFilters,
-}: any) => {
+}: UserFilterBarProps) => {
   return (
     <Paper
       elevation={0}
@@ -628,23 +661,32 @@ const UserGrid = () => {
     page,
     perPage,
     filterValues,
+    sort,
     setFilters,
+    setSort,
     setPage,
     setPerPage,
-  } = useListContext();
+  } = useListContext<UserRecord>();
   const redirect = useRedirect();
+  const notify = useNotify();
+  const refresh = useRefresh();
+  const [deleteOne] = useDelete();
 
   const [searchValue, setSearchValue] = useState(
-    (filterValues.search as string) ?? ""
+    typeof filterValues.search === "string" ? filterValues.search : ""
   );
-  const [sortValue, setSortValue] = useState("createdAt:DESC");
-  const [roleValue, setRoleValue] = useState((filterValues.role as string) ?? "");
+  const sortValue = `${sort.field}:${sort.order}`;
+  const [roleValue, setRoleValue] = useState(
+    typeof filterValues.role === "string" ? filterValues.role : ""
+  );
   const [genderValue, setGenderValue] = useState(
-    (filterValues.gender as string) ?? ""
+    typeof filterValues.gender === "string" ? filterValues.gender : ""
   );
-  const [ageValue, setAgeValue] = useState((filterValues.age as string) ?? "");
+  const [ageValue, setAgeValue] = useState(
+    typeof filterValues.age === "string" ? filterValues.age : ""
+  );
   const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<UserRecord | null>(null);
 
   const hasActiveFilters =
     Boolean(searchValue) ||
@@ -652,18 +694,14 @@ const UserGrid = () => {
     Boolean(genderValue) ||
     Boolean(ageValue);
 
-  const applyFilters = (overrides: Record<string, any> = {}) => {
-    const next: Record<string, any> = {
-      ...filterValues,
+  const applyFilters = (overrides: Partial<UserListFilters> = {}) => {
+    const next: UserListFilters = {
       search: searchValue || undefined,
       role: roleValue || undefined,
       gender: genderValue || undefined,
       age: ageValue || undefined,
       ...overrides,
     };
-    Object.keys(next).forEach((k) => {
-      if (next[k] === undefined || next[k] === "") delete next[k];
-    });
     setFilters(next, {});
     setPage(1);
   };
@@ -674,9 +712,9 @@ const UserGrid = () => {
   };
 
   const handleSort = (value: string) => {
-    setSortValue(value);
     const [field, order] = value.split(":");
-    setFilters(filterValues, { field, order: order as "ASC" | "DESC" });
+    if (!field || (order !== "ASC" && order !== "DESC")) return;
+    setSort({ field, order });
     setPage(1);
   };
 
@@ -704,10 +742,27 @@ const UserGrid = () => {
     setPage(1);
   };
 
-  const handleEdit = (id: string) => redirect("edit", "users", id);
-  const handleDelete = (id: string) => redirect("delete", "users", id);
+  const handleEdit = (id: UserRecord["id"]) => redirect("edit", "users", id);
+  const handleDelete = (record: UserRecord) => {
+    if (!window.confirm(`Supprimer le compte de ${record.fullName} ?`)) return;
 
-  const handleView = (record: any) => {
+    deleteOne(
+      "users",
+      { id: record.id, previousData: record },
+      {
+        onSuccess: () => {
+          notify("Le compte utilisateur a été supprimé.", { type: "success" });
+          refresh();
+        },
+        onError: (error: unknown) => {
+          const message = error instanceof Error ? error.message : "La suppression du compte a échoué.";
+          notify(message, { type: "error" });
+        },
+      }
+    );
+  };
+
+  const handleView = (record: UserRecord) => {
     setSelectedUser(record);
     setDetailOpen(true);
   };
@@ -817,13 +872,13 @@ const UserGrid = () => {
               gap: 2,
             }}
           >
-            {data.map((record: any) => (
+            {data.map((record: UserRecord) => (
               <UserCard
                 key={record.id}
                 record={record}
                 onView={() => handleView(record)}
                 onEdit={() => handleEdit(record.id)}
-                onDelete={() => handleDelete(record.id)}
+                onDelete={() => handleDelete(record)}
               />
             ))}
           </Box>

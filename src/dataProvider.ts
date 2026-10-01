@@ -9,6 +9,7 @@ const ADMIN_SCOPED = new Set([
   "deletion-requests",
   "profile-change-requests",
   "verifications",
+  "identity-verifications",
   "sellers",
   "contracts",
   "settlements",
@@ -78,7 +79,17 @@ export const dataProvider: DataProvider = {
       return { data: pageItems, total: items.length };
     }
 
-    const query = buildQuery({ page, limit: perPage, ...params.filter });
+    const query = buildQuery({
+      page,
+      limit: perPage,
+      ...params.filter,
+      ...(resource === "users"
+        ? {
+            sortField: params.sort.field,
+            sortOrder: params.sort.order,
+          }
+        : {}),
+    });
     const { json } = await httpClient(`${baseUrl(resource)}${query}`);
     const items = json.data.items ?? json.data.requests ?? [];
     return { data: items, total: json.data.pagination?.totalItems ?? items.length };

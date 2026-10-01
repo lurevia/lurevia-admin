@@ -283,6 +283,25 @@ export const VerificationDetailDialog = ({ open, onClose, record }: Props) => {
 
         <Stack spacing={1.75}>
           <InfoRow
+            icon={AdminIcon}
+            label={record.isGuardian ? "CIN du tuteur" : "Numéro CIN"}
+            value={record.isGuardian ? record.guardianCinNumber ?? "—" : record.cinNumber ?? "—"}
+          />
+          {record.isGuardian && (
+            <>
+              <InfoRow
+                icon={AdminIcon}
+                label="Nom du tuteur"
+                value={record.guardianFullName ?? "—"}
+              />
+              <InfoRow
+                icon={AdminIcon}
+                label="Lien avec le demandeur"
+                value={record.guardianRelation ?? "—"}
+              />
+            </>
+          )}
+          <InfoRow
             icon={CalendarIcon}
             label="Demandée le"
             value={formatDateTime(record.createdAt)}
@@ -385,8 +404,7 @@ export const VerificationDetailDialog = ({ open, onClose, record }: Props) => {
             <Typography
               sx={{ fontSize: 12.5, lineHeight: 1.6, color: "info.dark" }}
             >
-              Approuvez cette demande pour que l'utilisateur puisse passer
-              commande sur la boutique.
+              Examinez le numéro CIN selon la procédure de contrôle autorisée avant d'approuver. Cette vérification n'est pas effectuée automatiquement auprès d'un opérateur.
             </Typography>
           </Box>
         )}

@@ -276,14 +276,15 @@ export const VerificationActions = ({
 
           {!approved && (
             <TextField
-              label="Motif du rejet (optionnel)"
+              label="Motif du rejet"
               fullWidth
               multiline
               rows={3}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Ex : Documents insuffisants ou illisibles."
+              placeholder="Ex : Numéro CIN invalide ou informations incohérentes."
               helperText="Cette note sera visible par l'utilisateur."
+              required
               size="small"
             />
           )}
@@ -308,7 +309,7 @@ export const VerificationActions = ({
           </Button>
           <Button
             onClick={submit}
-            disabled={loading}
+            disabled={loading || (!approved && !reason.trim())}
             variant="contained"
             color={themeColor}
             startIcon={!loading && (approved ? <CheckIcon /> : <CloseIcon />)}

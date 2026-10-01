@@ -27,6 +27,7 @@ import ShieldOutlinedIconModule from "@mui/icons-material/ShieldOutlined";
 import StorefrontIconModule from "@mui/icons-material/Storefront";
 import PersonOutlineIconModule from "@mui/icons-material/PersonOutline";
 import { normalizeMuiIcon } from "../../muiIcon";
+import type { UserRecord } from "./userTypes";
 
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
 const EditIcon = normalizeMuiIcon(EditOutlinedIconModule);
@@ -44,7 +45,7 @@ const CustomerIcon = normalizeMuiIcon(PersonOutlineIconModule);
 interface Props {
   open: boolean;
   onClose: () => void;
-  record: any | null;
+  record: UserRecord | null;
   onEdit: () => void;
 }
 

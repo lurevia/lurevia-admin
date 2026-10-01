@@ -132,7 +132,7 @@ const ThemedAdmin = () => {
         icon={ManageAccountsIcon}
         options={{ label: "Modifications de profil" }}
       />
-      <Resource name="verifications" list={VerificationListPage} icon={FactCheckIcon} options={{ label: "Vérifications" }} />
+      <Resource name="identity-verifications" list={VerificationListPage} icon={FactCheckIcon} options={{ label: "Vérifications CIN" }} />
       <Resource name="sellers" list={SellersPage} icon={StorefrontIcon} options={{ label: "Vendeurs" }} />
       <Resource name="contracts" list={ContractsPage} icon={FactCheckIcon} options={{ label: "Contrats" }} />
       <Resource name="settlements" list={SettlementsPage} icon={AccountBalanceIcon} options={{ label: "Settlements" }} />

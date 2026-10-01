@@ -25,6 +25,7 @@ import ShieldOutlinedIconModule from "@mui/icons-material/ShieldOutlined";
 import StorefrontIconModule from "@mui/icons-material/Storefront";
 import PersonOutlineIconModule from "@mui/icons-material/PersonOutline";
 import { normalizeMuiIcon } from "../../muiIcon";
+import type { UserRecord } from "./userTypes";
 
 // ─── Icônes normalisées ───
 const MailIcon = normalizeMuiIcon(MailOutlineIconModule);
@@ -73,7 +74,7 @@ const getRoleConfig = (role: string) => {
 // APERÇU UTILISATEUR
 // ─────────────────────────────────────────────────────────────────────────────
 
-const UserPreview = ({ record }: { record: any }) => {
+const UserPreview = ({ record }: { record: UserRecord | undefined }) => {
   if (!record) return null;
 
   const roleConfig = getRoleConfig(record.role);
@@ -240,7 +241,7 @@ const UserPreview = ({ record }: { record: any }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const UserFormContent = () => {
-  const record = useRecordContext();
+  const record = useRecordContext<UserRecord>();
 
   return (
     <Box sx={{ width: "100%", pt: 2 }}>
@@ -383,11 +384,19 @@ const UserFormContent = () => {
               label="Rôle"
               choices={[
                 { id: "CUSTOMER", name: "Client — accès boutique uniquement" },
-                { id: "SELLER", name: "Vendeur — peut publier ses produits" },
+                {
+                  id: "SELLER",
+                  name: "Vendeur — peut publier ses produits",
+                  disabled: record?.isVerified !== true && record?.role !== "SELLER",
+                },
                 { id: "ADMIN", name: "Administrateur — accès complet" },
               ]}
               fullWidth
-              helperText="Seul le rôle peut être modifié depuis cet écran."
+              helperText={
+                record?.isVerified
+                  ? "Seul le rôle peut être modifié depuis cet écran."
+                  : "Un compte doit être vérifié avant de pouvoir recevoir le rôle vendeur."
+              }
             />
           </Box>
 
