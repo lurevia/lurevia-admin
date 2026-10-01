@@ -29,7 +29,7 @@ export const authProvider: AuthProvider = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ identifier: username, password }),
+      body: JSON.stringify({ email: username.trim().toLowerCase(), password }),
     });
 
     const body = await response.json().catch(() => null);
