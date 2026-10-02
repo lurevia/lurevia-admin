@@ -15,6 +15,7 @@ interface StoredUser {
   fullName: string;
   email?: string;
   role: "CUSTOMER" | "ADMIN";
+  isPrimaryAdmin: boolean;
   avatarUrl?: string;
 }
 
@@ -76,7 +77,13 @@ export const authProvider: AuthProvider = {
   async getIdentity() {
     const user = getStoredUser();
     if (!user) throw new Error("Utilisateur inconnu");
-    return { id: user.id, fullName: user.fullName, avatar: user.avatarUrl };
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      avatar: user.avatarUrl,
+      role: user.role,
+      isPrimaryAdmin: user.isPrimaryAdmin,
+    };
   },
 
   async getPermissions() {

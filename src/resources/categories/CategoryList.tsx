@@ -1,4 +1,4 @@
-import { List, useListContext, useRedirect, Title } from "react-admin";
+import { List, useGetIdentity, useListContext, useRedirect, Title } from "react-admin";
 import { useState } from "react";
 import {
   Box,
@@ -552,6 +552,8 @@ const CategoryGrid = () => {
     setPerPage,
   } = useListContext();
   const redirect = useRedirect();
+  const { data: identity } = useGetIdentity();
+  const canCreateCategory = identity?.isPrimaryAdmin === true;
 
   const [searchValue, setSearchValue] = useState(
     (filterValues.search as string) ?? ""
@@ -642,19 +644,16 @@ const CategoryGrid = () => {
           </Typography>
         </Box>
 
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleCreate}
-          sx={{
-            textTransform: "none",
-            fontWeight: 700,
-            borderRadius: 1.5,
-            boxShadow: "none",
-          }}
-        >
-          Nouvelle catégorie
-        </Button>
+        {canCreateCategory && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreate}
+            sx={{ textTransform: "none", fontWeight: 700, borderRadius: 1.5, boxShadow: "none" }}
+          >
+            Nouvelle catégorie
+          </Button>
+        )}
       </Stack>
 
       {/* Barre de filtres */}
@@ -726,7 +725,7 @@ const CategoryGrid = () => {
               ? "Aucun résultat pour ces critères. Essayez de modifier les filtres."
               : "Commencez par créer votre première catégorie."}
           </Typography>
-          {!hasActiveFilters && (
+          {!hasActiveFilters && canCreateCategory && (
             <Button
               variant="contained"
               startIcon={<AddIcon />}
