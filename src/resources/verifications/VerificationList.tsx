@@ -38,6 +38,7 @@ import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import CheckIconModule from "@mui/icons-material/Check";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatFrenchDateTime } from "../../utils/formatters";
 import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { VerificationActions } from "./VerificationActions";
@@ -137,13 +138,7 @@ const getStatusConfig = (status: string) => {
 
 const formatDateTime = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+  return formatFrenchDateTime(date);
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

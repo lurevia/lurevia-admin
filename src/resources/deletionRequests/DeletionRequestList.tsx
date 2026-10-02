@@ -41,6 +41,7 @@ import FilterAltOffIconModule from "@mui/icons-material/FilterAltOff";
 import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatFrenchDateTime as formatDate } from "../../utils/formatters";
 import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { DeletionRequestActions } from "./DeletionRequestActions";
@@ -111,17 +112,6 @@ const getStatusConfig = (status: string) => {
         icon: PendingIcon,
       };
   }
-};
-
-const formatDate = (date: string | null | undefined) => {
-  if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

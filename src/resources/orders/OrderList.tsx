@@ -40,6 +40,10 @@ import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import MoneyIconModule from "@mui/icons-material/Paid";
 import { normalizeMuiIcon } from "../../muiIcon";
+import {
+  formatAriary as formatMoney,
+  formatFrenchDateTime as formatDateTime,
+} from "../../utils/formatters";
 import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { OrderDetailDialog } from "./OrderDetailDialog";
@@ -151,23 +155,6 @@ const PAYMENT_LABELS: Record<string, string> = {
 
 const getPaymentLabel = (method: string) =>
   PAYMENT_LABELS[method] ?? method ?? "—";
-
-const formatMoney = (value: number | undefined | null) => {
-  const n = Number(value ?? 0);
-  if (!Number.isFinite(n)) return "—";
-  return new Intl.NumberFormat("fr-MG").format(n) + " Ar";
-};
-
-const formatDateTime = (date: string | null | undefined) => {
-  if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
-};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CARTE COMMANDE

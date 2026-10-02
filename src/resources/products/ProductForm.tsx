@@ -35,6 +35,7 @@ import AutoAwesomeIconModule from "@mui/icons-material/AutoAwesome";
 import AddPhotoAlternateIconModule from "@mui/icons-material/AddPhotoAlternate";
 import StarIconModule from "@mui/icons-material/Star";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatOptionalAriary as formatPrice } from "../../utils/formatters";
 import {
   AIGenerateDialog,
   type AIGeneratedProductDetails,
@@ -84,9 +85,6 @@ const ProductPreview = ({
   const previewSku = sku.trim() || "SKU-000";
   const mainImage = images[0];
   const hasDiscount = originalPrice && originalPrice > price && price > 0;
-
-  const formatPrice = (n: number) =>
-    n > 0 ? new Intl.NumberFormat("fr-MG").format(n) + " Ar" : "—";
 
   return (
     <Box>

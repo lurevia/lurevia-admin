@@ -41,6 +41,10 @@ import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import TagIconModule from "@mui/icons-material/Tag";
 import { normalizeMuiIcon } from "../../muiIcon";
+import {
+  formatAriary as formatMoney,
+  formatFrenchDate as formatDate,
+} from "../../utils/formatters";
 import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { FinanceDetailDialog } from "./FinanceDetailDialog";
@@ -180,21 +184,6 @@ const getStatusConfig = (status: string | null | undefined) => {
     color: color as "success" | "error" | "warning",
     icon: Icon,
   };
-};
-
-const formatDate = (date: string | null | undefined) => {
-  if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(date));
-};
-
-const formatMoney = (value: number | undefined | null) => {
-  const n = Number(value ?? 0);
-  if (!Number.isFinite(n)) return "—";
-  return new Intl.NumberFormat("fr-MG").format(n) + " Ar";
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

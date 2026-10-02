@@ -25,6 +25,7 @@ import CancelIconModule from "@mui/icons-material/Cancel";
 import AdminPanelSettingsIconModule from "@mui/icons-material/AdminPanelSettings";
 import ArrowRightAltIconModule from "@mui/icons-material/ArrowRightAlt";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatFrenchLongDateTime } from "../../utils/formatters";
 import { ProfileChangeActions } from "./ProfileChangeActions";
 
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
@@ -70,13 +71,7 @@ const getStatusConfig = (status: string) => {
 
 const formatDateTime = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+  return formatFrenchLongDateTime(date);
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

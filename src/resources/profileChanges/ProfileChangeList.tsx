@@ -35,6 +35,7 @@ import CancelIconModule from "@mui/icons-material/Cancel";
 import FilterAltOffIconModule from "@mui/icons-material/FilterAltOff";
 import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatFrenchDate } from "../../utils/formatters";
 import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { ProfileChangeActions } from "./ProfileChangeActions";
@@ -108,13 +109,7 @@ const getStatusConfig = (status: string) => {
 
 const formatDate = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+  return formatFrenchDate(date);
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

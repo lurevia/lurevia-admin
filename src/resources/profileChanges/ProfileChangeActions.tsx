@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNotify, useRecordContext, useRefresh } from "react-admin";
+import { useRecordContext } from "react-admin";
 import {
   Alert,
   Avatar,
@@ -21,6 +21,7 @@ import CancelOutlinedIconModule from "@mui/icons-material/CancelOutlined";
 import WarningAmberIconModule from "@mui/icons-material/WarningAmber";
 import { normalizeMuiIcon } from "../../muiIcon";
 import { reviewProfileChange } from "../../adminActions";
+import { useAdminAction } from "../../hooks/useAdminAction";
 
 const CheckIcon = normalizeMuiIcon(CheckIconModule);
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
@@ -44,12 +45,10 @@ type RecordType = {
 export const ProfileChangeActions = ({ record: recordProp }: { record?: RecordType }) => {
   const contextRecord = useRecordContext<RecordType>();
   const record = recordProp ?? contextRecord;
-  const notify = useNotify();
-  const refresh = useRefresh();
+  const { execute, loading } = useAdminAction();
   const [open, setOpen] = useState(false);
   const [approved, setApproved] = useState(true);
   const [note, setNote] = useState("");
-  const [loading, setLoading] = useState(false);
 
   if (!record || record.status !== "PENDING") return null;
 
@@ -65,24 +64,13 @@ export const ProfileChangeActions = ({ record: recordProp }: { record?: RecordTy
   ].filter(Boolean).length;
 
   const submit = async () => {
-    setLoading(true);
-    try {
-      await reviewProfileChange(record.id, approved, note || undefined);
-      notify(
-        approved ? "Modification approuvée." : "Modification rejetée.",
-        { type: "success" }
-      );
-      setOpen(false);
-      setNote("");
-      refresh();
-    } catch (err) {
-      notify(
-        err instanceof Error ? err.message : "Une erreur est survenue.",
-        { type: "error" }
-      );
-    } finally {
-      setLoading(false);
-    }
+    const succeeded = await execute(
+      () => reviewProfileChange(record.id, approved, note || undefined),
+      approved ? "Modification approuvée." : "Modification rejetée."
+    );
+    if (!succeeded) return;
+    setOpen(false);
+    setNote("");
   };
 
   return (

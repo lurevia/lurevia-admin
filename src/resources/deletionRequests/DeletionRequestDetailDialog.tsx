@@ -24,6 +24,7 @@ import CheckCircleIconModule from "@mui/icons-material/CheckCircle";
 import CancelIconModule from "@mui/icons-material/Cancel";
 import AdminPanelSettingsIconModule from "@mui/icons-material/AdminPanelSettings";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatFrenchLongDateTime } from "../../utils/formatters";
 import { DeletionRequestActions } from "./DeletionRequestActions";
 
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
@@ -56,13 +57,7 @@ const getStatusConfig = (status: string) => {
 
 const formatDateTime = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+  return formatFrenchLongDateTime(date);
 };
 
 export const DeletionRequestDetailDialog = ({ open, onClose, record }: Props) => {

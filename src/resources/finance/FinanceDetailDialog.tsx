@@ -28,6 +28,11 @@ import HourglassEmptyIconModule from "@mui/icons-material/HourglassEmpty";
 import CheckCircleIconModule from "@mui/icons-material/CheckCircle";
 import CancelIconModule from "@mui/icons-material/Cancel";
 import { normalizeMuiIcon } from "../../muiIcon";
+import {
+  formatAriary,
+  formatFrenchDate,
+  formatFrenchDateTime,
+} from "../../utils/formatters";
 
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
 const MailIcon = normalizeMuiIcon(MailOutlineIconModule);
@@ -94,28 +99,18 @@ const getStatusConfig = (status: string | null | undefined) => {
 
 const formatDate = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(date));
+  return formatFrenchDate(date, { month: "long" });
 };
 
 const formatDateTime = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+  return formatFrenchDateTime(date);
 };
 
 const formatMoney = (value: number | undefined | null) => {
   const n = Number(value ?? 0);
   if (!Number.isFinite(n)) return "—";
-  return new Intl.NumberFormat("fr-MG").format(n) + " Ar";
+  return formatAriary(n);
 };
 
 interface Props {

@@ -27,6 +27,7 @@ import ShieldOutlinedIconModule from "@mui/icons-material/ShieldOutlined";
 import StorefrontIconModule from "@mui/icons-material/Storefront";
 import PersonOutlineIconModule from "@mui/icons-material/PersonOutline";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatFrenchDate, formatFrenchDateTime } from "../../utils/formatters";
 import type { UserRecord } from "./userTypes";
 
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
@@ -51,22 +52,12 @@ interface Props {
 
 const formatDate = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(date));
+  return formatFrenchDate(date, { month: "long" });
 };
 
 const formatDateTime = (date: string | null | undefined) => {
   if (!date) return "Jamais";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+  return formatFrenchDateTime(date);
 };
 
 const getRoleConfig = (role: string) => {

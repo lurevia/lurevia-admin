@@ -32,6 +32,7 @@ import LocalShippingIconModule from "@mui/icons-material/LocalShipping";
 import CancelIconModule from "@mui/icons-material/Cancel";
 import InfoOutlinedIconModule from "@mui/icons-material/InfoOutlined";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatAriary, formatFrenchLongDateTime } from "../../utils/formatters";
 
 // ─── Icônes normalisées ───
 const MailIcon = normalizeMuiIcon(MailOutlineIconModule);
@@ -104,18 +105,12 @@ const getStatusConfig = (status: string) =>
 const formatMoney = (value: number | undefined | null) => {
   const n = Number(value ?? 0);
   if (!Number.isFinite(n)) return "—";
-  return new Intl.NumberFormat("fr-MG").format(n) + " Ar";
+  return formatAriary(n);
 };
 
 const formatDateTime = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+  return formatFrenchLongDateTime(date);
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

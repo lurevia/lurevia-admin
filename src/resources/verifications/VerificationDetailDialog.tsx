@@ -26,6 +26,7 @@ import TimerOffIconModule from "@mui/icons-material/TimerOff";
 import WarningAmberIconModule from "@mui/icons-material/WarningAmber";
 import AdminPanelSettingsIconModule from "@mui/icons-material/AdminPanelSettings";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatFrenchLongDateTime } from "../../utils/formatters";
 import { VerificationActions } from "./VerificationActions";
 
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
@@ -84,13 +85,7 @@ const getStatusConfig = (status: string) => {
 
 const formatDateTime = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+  return formatFrenchLongDateTime(date);
 };
 
 export const VerificationDetailDialog = ({ open, onClose, record }: Props) => {

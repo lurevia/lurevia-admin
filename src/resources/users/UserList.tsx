@@ -52,6 +52,7 @@ import TransgenderIconModule from "@mui/icons-material/Transgender";
 import AdminPanelSettingsIconModule from "@mui/icons-material/AdminPanelSettings";
 import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatFrenchDate } from "../../utils/formatters";
 import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { UserDetailDialog } from "./UserDetailDialog";
@@ -152,11 +153,7 @@ const getGenderLabel = (gender: string | null | undefined) => {
 
 const formatDate = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(date));
+  return formatFrenchDate(date);
 };
 
 type UserCardProps = {

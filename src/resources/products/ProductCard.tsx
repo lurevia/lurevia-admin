@@ -6,6 +6,7 @@ import VisibilityIconModule from "@mui/icons-material/VisibilityOutlined";
 import EditIconModule from "@mui/icons-material/EditOutlined";
 import DeleteIconModule from "@mui/icons-material/DeleteOutline";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatAriary } from "../../utils/formatters";
 import { ProductCardImage } from "./ProductCardImage";
 import type { ProductCardProps } from "./productTypes";
 
@@ -14,8 +15,6 @@ const WarningIcon = normalizeMuiIcon(WarningIconModule);
 const VisibilityIcon = normalizeMuiIcon(VisibilityIconModule);
 const EditIcon = normalizeMuiIcon(EditIconModule);
 const DeleteIcon = normalizeMuiIcon(DeleteIconModule);
-
-const formatPrice = (price: number) => `${new Intl.NumberFormat("fr-MG").format(price)} Ar`;
 
 export const ProductCard = ({ record, onView, onEdit, onDelete }: ProductCardProps) => {
   const price = record.price ?? 0;
@@ -50,11 +49,11 @@ export const ProductCard = ({ record, onView, onEdit, onDelete }: ProductCardPro
         </Typography>
         <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ mb: 0.75 }}>
           <Typography sx={{ fontSize: 13.5, fontWeight: 800, color: "primary.main" }}>
-            {formatPrice(price)}
+            {formatAriary(price)}
           </Typography>
           {discountPercent > 0 && (
             <Typography sx={{ fontSize: 10, color: "text.secondary", textDecoration: "line-through" }}>
-              {formatPrice(originalPrice)}
+              {formatAriary(originalPrice)}
             </Typography>
           )}
         </Stack>

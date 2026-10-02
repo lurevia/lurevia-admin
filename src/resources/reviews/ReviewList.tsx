@@ -36,6 +36,7 @@ import ShoppingBagIconModule from "@mui/icons-material/ShoppingBag";
 import StarRateIconModule from "@mui/icons-material/StarRate";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatFrenchDate } from "../../utils/formatters";
 import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { ReviewActions } from "./ReviewActions";
@@ -109,11 +110,7 @@ const getStatusConfig = (record: any) => {
 
 const formatDate = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(date));
+  return formatFrenchDate(date);
 };
 
 const StarRow = ({ rating }: { rating: number }) => (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNotify, useRecordContext, useRefresh } from "react-admin";
+import { useRecordContext } from "react-admin";
 import {
   Alert,
   Avatar,
@@ -22,6 +22,7 @@ import WarningAmberIconModule from "@mui/icons-material/WarningAmber";
 import InfoOutlinedIconModule from "@mui/icons-material/InfoOutlined";
 import { normalizeMuiIcon } from "../../muiIcon";
 import { approveVerification, rejectVerification } from "../../adminActions";
+import { useAdminAction } from "../../hooks/useAdminAction";
 
 // ─── Icônes normalisées ───
 const CheckIcon = normalizeMuiIcon(CheckIconModule);
@@ -53,13 +54,11 @@ export const VerificationActions = ({
 }: VerificationActionsProps) => {
   const contextRecord = useRecordContext<any>();
   const record = recordProp ?? contextRecord;
-  const notify = useNotify();
-  const refresh = useRefresh();
+  const { execute, loading } = useAdminAction();
 
   const [open, setOpen] = useState(false);
   const [approved, setApproved] = useState(true);
   const [reason, setReason] = useState("");
-  const [loading, setLoading] = useState(false);
 
   if (!record || record.status !== "PENDING") return null;
 
@@ -82,28 +81,17 @@ export const VerificationActions = ({
   };
 
   const submit = async () => {
-    setLoading(true);
-    try {
-      if (approved) {
-        await approveVerification(record.id);
-        notify("Compte approuvé et fonctionnalités activées.", {
-          type: "success",
-        });
-      } else {
-        await rejectVerification(record.id, reason || undefined);
-        notify("Demande de vérification rejetée.", { type: "success" });
-      }
-      setOpen(false);
-      setReason("");
-      refresh();
-    } catch (err) {
-      notify(
-        err instanceof Error ? err.message : "Une erreur est survenue.",
-        { type: "error" }
-      );
-    } finally {
-      setLoading(false);
-    }
+    const succeeded = await execute(
+      () => approved
+        ? approveVerification(record.id)
+        : rejectVerification(record.id, reason || undefined),
+      approved
+        ? "Compte approuvé et fonctionnalités activées."
+        : "Demande de vérification rejetée."
+    );
+    if (!succeeded) return;
+    setOpen(false);
+    setReason("");
   };
 
   const user = record.user ?? {};

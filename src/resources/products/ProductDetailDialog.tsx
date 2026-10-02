@@ -23,6 +23,10 @@ import PaletteIconModule from "@mui/icons-material/Palette";
 import StraightenIconModule from "@mui/icons-material/Straighten";
 import CalendarTodayIconModule from "@mui/icons-material/CalendarToday";
 import { normalizeMuiIcon } from "../../muiIcon";
+import {
+  formatFrenchDate as formatDate,
+  formatOptionalAriary as formatPrice,
+} from "../../utils/formatters";
 
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
 const EditIcon = normalizeMuiIcon(EditOutlinedIconModule);
@@ -40,18 +44,6 @@ interface Props {
   record: any | null;
   onEdit: () => void;
 }
-
-const formatPrice = (n: number) =>
-  n > 0 ? new Intl.NumberFormat("fr-MG").format(n) + " Ar" : "—";
-
-const formatDate = (date: string) =>
-  date
-    ? new Intl.DateTimeFormat("fr-FR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      }).format(new Date(date))
-    : "—";
 
 export const ProductDetailDialog = ({ open, onClose, record, onEdit }: Props) => {
   if (!record) return null;

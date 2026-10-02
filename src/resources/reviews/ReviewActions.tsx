@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNotify, useRecordContext, useRefresh } from "react-admin";
+import { useRecordContext } from "react-admin";
 import {
   Alert,
   Avatar,
@@ -22,6 +22,7 @@ import WarningAmberIconModule from "@mui/icons-material/WarningAmber";
 import StarIconModule from "@mui/icons-material/Star";
 import { normalizeMuiIcon } from "../../muiIcon";
 import { approveReview, rejectReview } from "../../adminActions";
+import { useAdminAction } from "../../hooks/useAdminAction";
 
 const CheckIcon = normalizeMuiIcon(CheckIconModule);
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
@@ -44,13 +45,11 @@ export const ReviewActions = ({
 }: ReviewActionsProps) => {
   const contextRecord = useRecordContext<any>();
   const record = recordProp ?? contextRecord;
-  const notify = useNotify();
-  const refresh = useRefresh();
+  const { execute, loading } = useAdminAction();
 
   const [open, setOpen] = useState(false);
   const [approved, setApproved] = useState(true);
   const [reason, setReason] = useState("");
-  const [loading, setLoading] = useState(false);
 
   if (!record || record.isApproved === true) return null;
 
@@ -64,26 +63,15 @@ export const ReviewActions = ({
   };
 
   const submit = async () => {
-    setLoading(true);
-    try {
-      if (approved) {
-        await approveReview(record.id);
-        notify("Avis approuvé et publié.", { type: "success" });
-      } else {
-        await rejectReview(record.id, reason || undefined);
-        notify("Avis rejeté.", { type: "success" });
-      }
-      setOpen(false);
-      setReason("");
-      refresh();
-    } catch (err) {
-      notify(
-        err instanceof Error ? err.message : "Une erreur est survenue.",
-        { type: "error" }
-      );
-    } finally {
-      setLoading(false);
-    }
+    const succeeded = await execute(
+      () => approved
+        ? approveReview(record.id)
+        : rejectReview(record.id, reason || undefined),
+      approved ? "Avis approuvé et publié." : "Avis rejeté."
+    );
+    if (!succeeded) return;
+    setOpen(false);
+    setReason("");
   };
 
   const themeColor = approved ? "success" : "error";

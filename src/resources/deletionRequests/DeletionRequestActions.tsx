@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNotify, useRefresh, useRecordContext } from "react-admin";
+import { useRecordContext } from "react-admin";
 import {
   Button,
   Dialog,
@@ -23,6 +23,7 @@ import {
   rejectDeletionRequest,
 } from "../../adminActions";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { useAdminAction } from "../../hooks/useAdminAction";
 
 const CheckIcon = normalizeMuiIcon(CheckIconModule);
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
@@ -41,11 +42,9 @@ export const DeletionRequestActions = ({
 }: DeletionRequestActionsProps) => {
   const contextRecord = useRecordContext();
   const record = recordProp ?? contextRecord;
-  const notify = useNotify();
-  const refresh = useRefresh();
+  const { execute, loading } = useAdminAction();
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
-  const [loading, setLoading] = useState(false);
 
   if (!record || record.status !== "pending") return null;
 
@@ -54,26 +53,16 @@ export const DeletionRequestActions = ({
   const themeColor = isApprove ? "success" : "error";
 
   const handleConfirm = async () => {
-    setLoading(true);
-    try {
-      const id = String(record.id);
-      if (isApprove) await approveDeletionRequest(id, note || undefined);
-      else await rejectDeletionRequest(id, note || undefined);
-      notify(
-        isApprove ? "Demande approuvée." : "Demande rejetée.",
-        { type: "success" }
-      );
-      setOpen(false);
-      setNote("");
-      refresh();
-    } catch (err) {
-      notify(
-        err instanceof Error ? err.message : "Une erreur est survenue.",
-        { type: "error" }
-      );
-    } finally {
-      setLoading(false);
-    }
+    const id = String(record.id);
+    const succeeded = await execute(
+      () => isApprove
+        ? approveDeletionRequest(id, note || undefined)
+        : rejectDeletionRequest(id, note || undefined),
+      isApprove ? "Demande approuvée." : "Demande rejetée."
+    );
+    if (!succeeded) return;
+    setOpen(false);
+    setNote("");
   };
 
   return (

@@ -33,6 +33,7 @@ import HourglassEmptyIconModule from "@mui/icons-material/HourglassEmpty";
 import CheckCircleIconModule from "@mui/icons-material/CheckCircle";
 import CancelIconModule from "@mui/icons-material/Cancel";
 import { normalizeMuiIcon } from "../../muiIcon";
+import { formatAriary, formatFrenchLongDateTime } from "../../utils/formatters";
 
 const CloseIcon = normalizeMuiIcon(CloseIconModule);
 const EditIcon = normalizeMuiIcon(EditOutlinedIconModule);
@@ -100,18 +101,12 @@ const PAYMENT_LABELS: Record<string, string> = {
 const formatMoney = (value: number | undefined | null) => {
   const n = Number(value ?? 0);
   if (!Number.isFinite(n)) return "—";
-  return new Intl.NumberFormat("fr-MG").format(n) + " Ar";
+  return formatAriary(n);
 };
 
 const formatDateTime = (date: string | null | undefined) => {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date));
+  return formatFrenchLongDateTime(date);
 };
 
 export const OrderDetailDialog = ({ open, onClose, record, onEdit }: Props) => {
