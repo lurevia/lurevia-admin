@@ -54,6 +54,7 @@ import { normalizeMuiIcon } from "../../muiIcon";
 import { scrollAdminContentToTop } from "../../utils/scrollAdminContent";
 import { SmartSelect, type SmartSelectOption } from "../../components/SmartSelect";
 import { ProductDetailDialog } from "./ProductDetailDialog";
+import { ProductCard as RefactoredProductCard } from "./ProductCard";
 
 // ─── Icônes normalisées ───
 const InventoryIcon = normalizeMuiIcon(InventoryIconModule);
@@ -1147,7 +1148,7 @@ const ProductGrid = () => {
             }}
           >
             {data.map((record: any) => (
-              <ProductCard
+              <RefactoredProductCard
                 key={record.id}
                 record={record}
                 onView={() => handleView(record)}
