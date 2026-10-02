@@ -210,7 +210,7 @@ const FinanceCard = ({ resource, record, onView }: FinanceCardProps) => {
             <CardHeader
               initial={(record.name ?? "?").charAt(0).toUpperCase()}
               title={record.name}
-              subtitle={record.email}
+              subtitle={record.sellerName ? `${record.sellerName} · ${record.email}` : record.email}
               statusConfig={statusConfig}
             />
             <Stack spacing={0.75} sx={{ mt: 2 }}>
@@ -904,7 +904,7 @@ const FinanceGrid = ({ resource }: { resource: ResourceKey }) => {
       <FinanceFilterBar
         resource={resource}
         searchValue={searchValue}
-        onSearchValue={handleSearch}
+        onSearchChange={handleSearch}
         sortValue={sortValue}
         onSortChange={handleSort}
         statusValue={statusValue}
@@ -916,7 +916,7 @@ const FinanceGrid = ({ resource }: { resource: ResourceKey }) => {
       {/* Grille */}
       {isLoading ? (
         <Box
-          sx={{
+              subtitle={record.sellerName ? `${record.sellerName} · ${record.email}` : record.email}
             display: "grid",
             gridTemplateColumns: {
               xs: "1fr",
