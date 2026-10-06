@@ -76,7 +76,12 @@ const RefIcon = normalizeMuiIcon(TagIconModule);
 // CONFIG PAR RESSOURCE
 // ─────────────────────────────────────────────────────────────────────────────
 
-type ResourceKey = "sellers" | "contracts" | "settlements" | "commissions" | "transfers";
+type ResourceKey =
+  | "sellers"
+  | "contracts"
+  | "settlements"
+  | "commissions"
+  | "transfers";
 
 interface ResourceConfig {
   label: string;
@@ -117,7 +122,11 @@ const RESOURCE_CONFIG: Record<ResourceKey, ResourceConfig> = {
     statusOptions: [
       { value: "PENDING_REVIEW", label: "En revue", icon: PendingIcon },
       { value: "READY", label: "Prêts", icon: ApprovedIcon },
-      { value: "TRANSFER_PENDING", label: "Transfert en cours", icon: PendingIcon },
+      {
+        value: "TRANSFER_PENDING",
+        label: "Transfert en cours",
+        icon: PendingIcon,
+      },
       { value: "PAID", label: "Payés", icon: ApprovedIcon },
       { value: "FAILED", label: "Échoués", icon: RejectedIcon },
       { value: "CANCELLED", label: "Annulés", icon: RejectedIcon },
@@ -171,12 +180,19 @@ const STATUS_LABELS: Record<string, string> = {
 const getStatusConfig = (status: string | null | undefined) => {
   if (!status) return null;
   const normalized = status.toLowerCase();
-  const isSuccess = ["active", "approved", "paid", "completed", "ready"].includes(
-    normalized
-  );
-  const isError = ["rejected", "failed", "cancelled", "suspended"].includes(
-    normalized
-  );
+  const isSuccess = [
+    "active",
+    "approved",
+    "paid",
+    "completed",
+    "ready",
+  ].includes(normalized);
+  const isError = [
+    "rejected",
+    "failed",
+    "cancelled",
+    "suspended",
+  ].includes(normalized);
   const color = isSuccess ? "success" : isError ? "error" : "warning";
   const Icon = isSuccess ? ApprovedIcon : isError ? RejectedIcon : PendingIcon;
   return {
@@ -198,10 +214,9 @@ interface FinanceCardProps {
 
 const FinanceCard = ({ resource, record, onView }: FinanceCardProps) => {
   const config = RESOURCE_CONFIG[resource];
+  void config;
   const statusConfig = getStatusConfig(record.status);
-  const StatusIconCmp = statusConfig?.icon;
 
-  // Rendu spécifique par ressource
   const renderContent = () => {
     switch (resource) {
       case "sellers":
@@ -210,7 +225,11 @@ const FinanceCard = ({ resource, record, onView }: FinanceCardProps) => {
             <CardHeader
               initial={(record.name ?? "?").charAt(0).toUpperCase()}
               title={record.name}
-              subtitle={record.sellerName ? `${record.sellerName} · ${record.email}` : record.email}
+              subtitle={
+                record.sellerName
+                  ? `${record.sellerName} · ${record.email}`
+                  : record.email
+              }
               statusConfig={statusConfig}
             />
             <Stack spacing={0.75} sx={{ mt: 2 }}>
@@ -218,7 +237,11 @@ const FinanceCard = ({ resource, record, onView }: FinanceCardProps) => {
               <InfoRow
                 icon={RateIcon}
                 label="Commission"
-                value={record.commissionRate != null ? `${record.commissionRate} %` : "—"}
+                value={
+                  record.commissionRate != null
+                    ? `${record.commissionRate} %`
+                    : "—"
+                }
               />
               <InfoRow
                 icon={DateIcon}
@@ -399,7 +422,10 @@ const FinanceCard = ({ resource, record, onView }: FinanceCardProps) => {
               color: "text.secondary",
               width: 30,
               height: 30,
-              "&:hover": { color: "info.main", backgroundColor: "action.hover" },
+              "&:hover": {
+                color: "info.main",
+                backgroundColor: "action.hover",
+              },
             }}
           >
             <VisibilityIcon sx={{ fontSize: 16 }} />
@@ -563,10 +589,12 @@ const FinanceSkeleton = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PER_PAGE_OPTIONS = [12, 24, 48, 96];
-const PER_PAGE_SELECT_OPTIONS: SmartSelectOption[] = PER_PAGE_OPTIONS.map((n) => ({
-  value: String(n),
-  label: `${n} / page`,
-}));
+const PER_PAGE_SELECT_OPTIONS: SmartSelectOption[] = PER_PAGE_OPTIONS.map(
+  (n) => ({
+    value: String(n),
+    label: `${n} / page`,
+  })
+);
 
 const FinancePagination = ({
   page,
@@ -605,7 +633,11 @@ const FinancePagination = ({
         justifyContent="space-between"
       >
         <Stack direction="row" spacing={1.5} alignItems="center">
-          <Typography variant="body2" color="text.secondary" sx={{ fontSize: 12.5 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontSize: 12.5 }}
+          >
             <strong>{total}</strong> {singular.toLowerCase()}
             {total > 1 ? "s" : ""}
           </Typography>
@@ -688,7 +720,8 @@ const FinanceFilterBar = ({
       >
         <TextField
           value={searchValue}
-          onChange={(e) => onSearchChange(e.target.value)} placeholder="Rechercher…"
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Rechercher…"
           size="small"
           sx={{
             flex: { md: "1 1 200px", lg: "1 1 240px" },
@@ -784,9 +817,6 @@ const FinanceFilterBar = ({
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GRILLE
-// ─────────────────────────────────────────────────────────────────────────────
 
 const FinanceGrid = ({ resource }: { resource: ResourceKey }) => {
   const {
@@ -864,7 +894,6 @@ const FinanceGrid = ({ resource }: { resource: ResourceKey }) => {
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Title title={config.label} />
 
-      {/* Header */}
       <Stack
         direction={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
@@ -900,7 +929,6 @@ const FinanceGrid = ({ resource }: { resource: ResourceKey }) => {
         </Stack>
       </Stack>
 
-      {/* Filtres */}
       <FinanceFilterBar
         resource={resource}
         searchValue={searchValue}
@@ -916,7 +944,7 @@ const FinanceGrid = ({ resource }: { resource: ResourceKey }) => {
       {/* Grille */}
       {isLoading ? (
         <Box
-              subtitle={record.sellerName ? `${record.sellerName} · ${record.email}` : record.email}
+          sx={{
             display: "grid",
             gridTemplateColumns: {
               xs: "1fr",
