@@ -267,9 +267,10 @@ export const FinanceDetailDialog = ({ open, onClose, resource, record }: Props) 
         )}
 
         {/* Header avec avatar + nom */}
-        {record.sellerName && (
+        {(record.sellerName || record.name) && (
           <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
             <Avatar
+              src={record.avatarUrl || record.logoUrl || `https://picsum.photos/seed/${record.id}/200/200`}
               sx={{
                 width: 56,
                 height: 56,
@@ -279,18 +280,23 @@ export const FinanceDetailDialog = ({ open, onClose, resource, record }: Props) 
                 color: "primary.contrastText",
               }}
             >
-              {record.sellerName.charAt(0).toUpperCase()}
+              {(record.sellerName || record.name || "?").charAt(0).toUpperCase()}
             </Avatar>
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.25 }}>
-                {record.sellerName}
+                {record.name || record.sellerName}
               </Typography>
+              {record.sellerName && record.name && record.sellerName !== record.name && (
+                <Typography variant="body2" color="text.secondary">
+                  Vendeur : {record.sellerName}
+                </Typography>
+              )}
               <Typography
                 variant="caption"
                 color="text.secondary"
                 sx={{ fontFamily: "monospace", fontSize: 10.5 }}
               >
-                ID : {String(record.sellerId ?? record.id).slice(0, 12)}…
+                ID : {String(record.sellerId ?? record.id).slice(0, 16)}
               </Typography>
             </Box>
           </Stack>
@@ -300,7 +306,10 @@ export const FinanceDetailDialog = ({ open, onClose, resource, record }: Props) 
         <Stack spacing={2}>
           {resource === "sellers" && (
             <>
+              <DetailRow icon={SellerIcon} label="Boutique" value={record.name ?? "—"} />
+              {record.sellerName && <DetailRow icon={SellerIcon} label="Vendeur" value={record.sellerName} />}
               <DetailRow icon={MailIcon} label="Email" value={record.email ?? "—"} />
+              {record.phone && <DetailRow icon={MailIcon} label="Téléphone" value={record.phone} />}
               <DetailRow
                 icon={RateIcon}
                 label="Commission"

@@ -88,6 +88,9 @@ const queryClient = new QueryClient({
 const ThemedAdmin = () => {
   const { config } = useThemeCustomizer();
   const theme = useMemo(() => buildTheme(config), [config]);
+  const adminBasename = window.location.pathname.startsWith("/lurevia-admin")
+    ? "/lurevia-admin"
+    : undefined;
 
   return (
     <Admin
@@ -100,7 +103,7 @@ const ThemedAdmin = () => {
       layout={LureviaLayout}
       dashboard={DashboardPage}
       loginPage={LoginPage}
-      basename="/lurevia-admin"
+      basename={adminBasename}
       requireAuth
       disableTelemetry
     >
@@ -143,6 +146,7 @@ const ThemedAdmin = () => {
       <Resource name="transfers" list={TransfersPage} icon={SwapHorizIcon} options={{ label: "Transferts" }} />
       <Resource name="pages" list={SitePagesPage} icon={ArticleIcon} options={{ label: "Pages du site" }} />
       <CustomRoutes>
+        <Route path="/verifications" element={<VerificationListPage />} />
         <Route path="/messages" element={<AdminMessage />} />
         <Route path="/admins/create" element={<AdminCreatePage />} />
         <Route path="/financial-dashboard" element={<FinancialDashboardPage />} />

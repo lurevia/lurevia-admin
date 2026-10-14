@@ -1,0 +1,7 @@
+{
+  "name": "Lurevia — Espace Admin",
+  "description": "Espace d'administration pour la plateforme Lurevia",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

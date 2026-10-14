@@ -3,7 +3,7 @@ import { fetchUtils, HttpError } from "react-admin";
 const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
 
 export const API_URL = (
-  configuredApiUrl || "http://localhost:4000/api/v1"
+  configuredApiUrl || "/api/v1"
 ).replace(/\/+$/, "");
 const ACCESS_TOKEN_KEY = "lurevia_admin_access_token";
 const USER_KEY = "lurevia_admin_user";

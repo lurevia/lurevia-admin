@@ -40,6 +40,8 @@ import FilterAltOffIconModule from "@mui/icons-material/FilterAltOff";
 import ViewModuleIconModule from "@mui/icons-material/ViewModule";
 import BadgeIconModule from "@mui/icons-material/Badge";
 import TagIconModule from "@mui/icons-material/Tag";
+import PhoneIconModule from "@mui/icons-material/Phone";
+import PersonOutlineIconModule from "@mui/icons-material/PersonOutline";
 import { normalizeMuiIcon } from "../../muiIcon";
 import {
   formatAriary as formatMoney,
@@ -71,6 +73,8 @@ const FilterOffIcon = normalizeMuiIcon(FilterAltOffIconModule);
 const ViewModuleIcon = normalizeMuiIcon(ViewModuleIconModule);
 const StatusIcon = normalizeMuiIcon(BadgeIconModule);
 const RefIcon = normalizeMuiIcon(TagIconModule);
+const PhoneIcon = normalizeMuiIcon(PhoneIconModule);
+const CustomerIcon = normalizeMuiIcon(PersonOutlineIconModule);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONFIG PAR RESSOURCE
@@ -223,17 +227,25 @@ const FinanceCard = ({ resource, record, onView }: FinanceCardProps) => {
         return (
           <>
             <CardHeader
-              initial={(record.name ?? "?").charAt(0).toUpperCase()}
-              title={record.name}
+              initial={(record.sellerName || record.name || "?").charAt(0).toUpperCase()}
+              avatarUrl={
+                record.avatarUrl ||
+                record.logoUrl ||
+                `https://picsum.photos/seed/${record.id}/200/200`
+              }
+              title={record.name || record.sellerName || "Boutique"}
               subtitle={
                 record.sellerName
-                  ? `${record.sellerName} · ${record.email}`
+                  ? `${record.sellerName} · ${record.phone || record.email}`
                   : record.email
               }
               statusConfig={statusConfig}
             />
             <Stack spacing={0.75} sx={{ mt: 2 }}>
+              <InfoRow icon={SellerIcon} label="Boutique" value={record.name || "—"} />
+              <InfoRow icon={CustomerIcon} label="Vendeur" value={record.sellerName || "—"} />
               <InfoRow icon={MailIcon} label="Email" value={record.email} />
+              <InfoRow icon={PhoneIcon} label="Téléphone" value={record.phone || "—"} />
               <InfoRow
                 icon={RateIcon}
                 label="Commission"
@@ -442,11 +454,13 @@ const FinanceCard = ({ resource, record, onView }: FinanceCardProps) => {
 
 const CardHeader = ({
   initial,
+  avatarUrl,
   title,
   subtitle,
   statusConfig,
 }: {
   initial: string;
+  avatarUrl?: string;
   title: string;
   subtitle?: string;
   statusConfig: any;
@@ -455,6 +469,7 @@ const CardHeader = ({
   return (
     <Stack direction="row" spacing={1.5} alignItems="center">
       <Avatar
+        src={avatarUrl}
         sx={{
           width: 48,
           height: 48,

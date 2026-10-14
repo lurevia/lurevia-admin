@@ -30,6 +30,8 @@ import AccountBalanceIconModule from "@mui/icons-material/AccountBalance";
 import SwapHorizIconModule from "@mui/icons-material/SwapHoriz";
 import BarChartIconModule from "@mui/icons-material/BarChart";
 import AdminPanelSettingsIconModule from "@mui/icons-material/AdminPanelSettings";
+import ArticleIconModule from "@mui/icons-material/Article";
+import SettingsIconModule from "@mui/icons-material/Settings";
 import type { SvgIconComponent } from "@mui/icons-material";
 import { normalizeMuiIcon } from "../muiIcon";
 
@@ -51,6 +53,8 @@ const AccountBalanceIcon = normalizeMuiIcon(AccountBalanceIconModule);
 const SwapHorizIcon = normalizeMuiIcon(SwapHorizIconModule);
 const BarChartIcon = normalizeMuiIcon(BarChartIconModule);
 const AdminPanelSettingsIcon = normalizeMuiIcon(AdminPanelSettingsIconModule);
+const ArticleIcon = normalizeMuiIcon(ArticleIconModule);
+const SettingsIcon = normalizeMuiIcon(SettingsIconModule);
 
 // ─── Persistance ───
 const STORAGE_OPEN_KEY = "lurevia-admin-menu-open-categories";
@@ -111,15 +115,24 @@ const MENU_CATEGORIES: MenuCategoryConfig[] = [
   },
   {
     id: "clients",
-    label: "Clients",
+    label: "Clients & Modération",
     icon: PeopleIcon,
     items: [
       { to: "/users", label: "Utilisateurs", icon: PeopleIcon },
       { to: "/admins/create", label: "Créer un admin", icon: AdminPanelSettingsIcon },
-      { to: "/verifications", label: "Vérifications", icon: FactCheckIcon },
+      { to: "/identity-verifications", label: "Vérifications CIN", icon: FactCheckIcon },
       { to: "/profile-change-requests", label: "Modifs profil", icon: ManageAccountsIcon },
       { to: "/deletion-requests", label: "Suppressions", icon: PersonRemoveIcon },
       { to: "/messages", label: "Messages clients", icon: MarkEmailReadIcon },
+    ],
+  },
+  {
+    id: "systeme",
+    label: "Contenu & Paramètres",
+    icon: SettingsIcon,
+    items: [
+      { to: "/pages", label: "Pages du site", icon: ArticleIcon },
+      { to: "/configuration", label: "Configuration", icon: SettingsIcon },
     ],
   },
 ];

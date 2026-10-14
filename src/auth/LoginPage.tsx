@@ -26,8 +26,8 @@ export const LureviaLoginPage = () => {
   const login = useLogin();
   const notify = useNotify();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("admin@lurevia.mg");
+  const [password, setPassword] = useState("Mahery123456789.");
   const [remember, setRemember] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -239,6 +239,10 @@ export const LureviaLoginPage = () => {
                 {error}
               </Alert>
             )}
+
+            <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+              Compte administrateur : <strong>admin@lurevia.mg</strong> / <strong>Mahery123456789.</strong>
+            </Alert>
 
             <Box component="form" onSubmit={handleSubmit}>
               <Stack spacing={2.5}>
