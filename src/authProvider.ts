@@ -58,20 +58,25 @@ export const authProvider: AuthProvider = {
   },
 
   async checkAuth() {
-    if (getAccessToken()) return;
-    const token = await refreshAccessToken();
-    if (!token) throw new Error("Session expirée. Reconnectez-vous.");
+    const token = getAccessToken();
+    if (token) return;
+    const refreshed = await refreshAccessToken();
+    if (!refreshed) {
+      clearAdminSession();
+      throw new Error("Session expirée. Reconnectez-vous.");
+    }
   },
 
   async checkError(error) {
     const status = (error as { status?: number })?.status;
     if (status === 401) {
       clearAdminSession();
-      throw new Error("Session expirée. Reconnectez-vous.");
+      return Promise.reject({ redirectTo: "/login", message: "Session expirée. Reconnectez-vous." });
     }
     if (status === 403) {
-      throw new Error("Accès refusé.");
+      return Promise.reject({ message: "Accès refusé." });
     }
+    return Promise.resolve();
   },
 
   async getIdentity() {

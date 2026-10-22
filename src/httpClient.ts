@@ -9,7 +9,39 @@ const ACCESS_TOKEN_KEY = "lurevia_admin_access_token";
 const USER_KEY = "lurevia_admin_user";
 let refreshInFlight: Promise<string | null> | null = null;
 
-export const getAccessToken = (): string | null => localStorage.getItem(ACCESS_TOKEN_KEY);
+export const isTokenExpired = (token: string | null): boolean => {
+  if (!token) return true;
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return true;
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    const parsed = JSON.parse(jsonPayload);
+    if (!parsed.exp) return false;
+    // Buffer de 10 secondes pour anticiper l'expiration
+    return Date.now() >= parsed.exp * 1000 - 10_000;
+  } catch {
+    return true;
+  }
+};
+
+export const getRawAccessToken = (): string | null => localStorage.getItem(ACCESS_TOKEN_KEY);
+
+export const getAccessToken = (): string | null => {
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+  if (!token) return null;
+  if (isTokenExpired(token)) {
+    return null;
+  }
+  return token;
+};
+
 export const setAccessToken = (token: string): void => localStorage.setItem(ACCESS_TOKEN_KEY, token);
 export const clearAccessToken = (): void => localStorage.removeItem(ACCESS_TOKEN_KEY);
 
@@ -49,7 +81,13 @@ export const refreshAccessToken = (): Promise<string | null> => {
 
 export const httpClient = async (url: string, options: fetchUtils.Options = {}) => {
   const headers = new Headers(options.headers ?? { Accept: "application/json" });
-  const token = getAccessToken();
+  let token = getAccessToken();
+
+  // Si le token a expiré mais qu'on a un jeton brut ou une session potentielle, tenter le rafraîchissement
+  if (!token && getRawAccessToken()) {
+    token = await refreshAccessToken();
+  }
+
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
   try {
@@ -57,10 +95,7 @@ export const httpClient = async (url: string, options: fetchUtils.Options = {}) 
   } catch (err) {
     if (err instanceof HttpError) {
       if (err.status === 401) {
-        const currentToken = getAccessToken();
-        const refreshedToken = currentToken !== token
-          ? currentToken
-          : await refreshAccessToken();
+        const refreshedToken = await refreshAccessToken();
         if (refreshedToken) {
           const retryHeaders = new Headers(options.headers ?? { Accept: "application/json" });
           retryHeaders.set("Authorization", `Bearer ${refreshedToken}`);
@@ -71,8 +106,11 @@ export const httpClient = async (url: string, options: fetchUtils.Options = {}) 
           });
         }
       }
-      const body = err.body as { message?: string; code?: string } | undefined;
-      throw new HttpError(body?.message ?? err.message, err.status, err.body);
+      const body = err.body as
+        | { message?: string; code?: string; error?: { message?: string } }
+        | undefined;
+      const message = body?.error?.message ?? body?.message ?? err.message;
+      throw new HttpError(message, err.status, err.body);
     }
     throw err;
   }

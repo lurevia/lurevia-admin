@@ -32,6 +32,7 @@ import BarChartIconModule from "@mui/icons-material/BarChart";
 import AdminPanelSettingsIconModule from "@mui/icons-material/AdminPanelSettings";
 import ArticleIconModule from "@mui/icons-material/Article";
 import SettingsIconModule from "@mui/icons-material/Settings";
+import NotificationsIconModule from "@mui/icons-material/Notifications";
 import type { SvgIconComponent } from "@mui/icons-material";
 import { normalizeMuiIcon } from "../muiIcon";
 
@@ -55,6 +56,7 @@ const BarChartIcon = normalizeMuiIcon(BarChartIconModule);
 const AdminPanelSettingsIcon = normalizeMuiIcon(AdminPanelSettingsIconModule);
 const ArticleIcon = normalizeMuiIcon(ArticleIconModule);
 const SettingsIcon = normalizeMuiIcon(SettingsIconModule);
+const NotificationsIcon = normalizeMuiIcon(NotificationsIconModule);
 
 // ─── Persistance ───
 const STORAGE_OPEN_KEY = "lurevia-admin-menu-open-categories";
@@ -154,6 +156,7 @@ const findActiveCategoryId = (pathname: string): string | null => {
 
 const getActiveLabel = (pathname: string): string => {
   if (pathname === "/") return "Tableau de bord";
+  if (pathname.startsWith("/notifications")) return "Centre de notifications";
   for (const cat of MENU_CATEGORIES) {
     for (const item of cat.items) {
       if (matchesPath(pathname, item.to)) return item.label;
@@ -337,6 +340,45 @@ export const LureviaMenu = () => {
               primaryTypographyProps={{
                 fontSize: 13.5,
                 fontWeight: matchesPath(location.pathname, "/") ? 700 : 500,
+              }}
+            />
+          </ListItemButton>
+
+          {/* ─── Notifications ─── */}
+          <ListItemButton
+            component={Link}
+            to="/notifications"
+            sx={{
+              borderRadius: 1.5,
+              margin: "2px 8px",
+              minHeight: 40,
+              pl: 1.5,
+              pr: 1.5,
+              color: matchesPath(location.pathname, "/notifications")
+                ? "text.primary"
+                : "text.secondary",
+              ...(matchesPath(location.pathname, "/notifications") && {
+                backgroundColor: "action.selected",
+                "&:hover": { backgroundColor: "action.selected" },
+              }),
+              "&:hover": { backgroundColor: "action.hover" },
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 32,
+                color: matchesPath(location.pathname, "/notifications")
+                  ? "text.primary"
+                  : "text.secondary",
+              }}
+            >
+              <NotificationsIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText
+              primary="Notifications"
+              primaryTypographyProps={{
+                fontSize: 13.5,
+                fontWeight: matchesPath(location.pathname, "/notifications") ? 700 : 500,
               }}
             />
           </ListItemButton>

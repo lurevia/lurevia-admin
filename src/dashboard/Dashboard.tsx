@@ -4,6 +4,8 @@ import {
   Alert,
   Avatar,
   Box,
+  Button,
+  ButtonGroup,
   Card,
   Chip,
   Divider,
@@ -36,6 +38,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 // ─── Icônes ───
 import PaidIconModule from "@mui/icons-material/Paid";
@@ -53,11 +56,14 @@ import BarChartIconModule from "@mui/icons-material/BarChart";
 import StarIconModule from "@mui/icons-material/Star";
 import RefreshIconModule from "@mui/icons-material/Refresh";
 import ShoppingCartIconModule from "@mui/icons-material/ShoppingCart";
+import ArrowForwardIconModule from "@mui/icons-material/ArrowForward";
+
 import { normalizeMuiIcon } from "../muiIcon";
 import { StatCard } from "./StatCard";
 import {
   fetchAdminNotifications,
   fetchStats,
+  navigateToNotification,
   type AdminNotificationRecord,
 } from "../adminActions";
 
@@ -77,9 +83,10 @@ const BarIcon = normalizeMuiIcon(BarChartIconModule);
 const StarIcon = normalizeMuiIcon(StarIconModule);
 const RefreshIcon = normalizeMuiIcon(RefreshIconModule);
 const ShoppingCartIcon = normalizeMuiIcon(ShoppingCartIconModule);
+const ArrowForwardIcon = normalizeMuiIcon(ArrowForwardIconModule);
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CONSTANTES
+// CONSTANTES & FORMATTEURS
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CHART_COLORS = [
@@ -124,23 +131,30 @@ const formatShortAriary = (amount: number) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SOUS-COMPOSANTS
+// COMPOSANT CONTENEUR DE GRAPHIQUE ROBUSTE (Hauteur explicite garantie)
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Wrapper de carte pour un graphique (sans titre — le titre est dans l'onglet).
- */
-const ChartWrapper = ({ children }: { children: React.ReactNode }) => (
-  <Box sx={{ width: "100%", height: "100%", px: 1 }}>
-    <ResponsiveContainer width="100%" height="100%">
+interface ChartWrapperProps {
+  children: React.ReactNode;
+  height?: number;
+}
+
+const ChartWrapper = ({ children, height = 310 }: ChartWrapperProps) => (
+  <Box
+    sx={{
+      width: "100%",
+      height,
+      minHeight: height,
+      position: "relative",
+      minWidth: 0,
+    }}
+  >
+    <ResponsiveContainer width="100%" height={height}>
       {children as any}
     </ResponsiveContainer>
   </Box>
 );
 
-/**
- * Tooltip personnalisé pour Recharts.
- */
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload || !payload.length) return null;
   return (
@@ -189,28 +203,25 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-/**
- * Message affiché si aucune donnée n'est disponible.
- */
-const EmptyChart = ({ label = "Aucune donnée" }: { label?: string }) => (
+const EmptyChart = ({ label = "Aucune donnée disponible" }: { label?: string }) => (
   <Box
     sx={{
       width: "100%",
-      height: "100%",
+      height: 240,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       color: "text.secondary",
-      fontSize: 12,
+      fontSize: 12.5,
+      border: "1px dashed",
+      borderColor: "divider",
+      borderRadius: 2,
+      bgcolor: "action.hover",
     }}
   >
     {label}
   </Box>
 );
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ONGLETS
-// ─────────────────────────────────────────────────────────────────────────────
 
 interface TabPanelProps {
   children: React.ReactNode;
@@ -235,10 +246,12 @@ const TabPanel = ({ children, value, index }: TabPanelProps) => (
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<any>(null);
   const [activity, setActivity] = useState<AdminNotificationRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "tabs">("grid");
   const [tabValue, setTabValue] = useState(0);
 
   const loadData = () => {
@@ -263,7 +276,7 @@ export const Dashboard = () => {
     setTabValue(newValue);
   };
 
-  // ─── Extraction des données ───
+  // Extraction des données avec valeurs par défaut
   const revenueLast30d = stats?.revenue30d ?? 0;
   const orders30dCount = stats?.orders30dCount ?? 0;
   const totalUsers = stats?.totalUsers ?? 0;
@@ -311,13 +324,318 @@ export const Dashboard = () => {
     );
   }
 
+  // ─── RENDU DU GRAPHIQUE 1 : REVENU ───
+  const renderRevenueChart = (height = 320) => (
+    <Box sx={{ width: "100%" }}>
+      {revenueSeries.length === 0 ? (
+        <EmptyChart label="Aucune donnée de revenu sur les 30 derniers jours" />
+      ) : (
+        <ChartWrapper height={height}>
+          <AreaChart data={revenueSeries} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={CHART_COLORS[0]} stopOpacity={0.35} />
+                <stop offset="100%" stopColor={CHART_COLORS[0]} stopOpacity={0.02} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E4EAF4" vertical={false} />
+            <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#64748B" }} stroke="#CBD5E1" tickLine={false} />
+            <YAxis
+              tick={{ fontSize: 11, fill: "#64748B" }}
+              stroke="#CBD5E1"
+              tickLine={false}
+              tickFormatter={formatShortAriary}
+            />
+            <RechartsTooltip content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="revenue"
+              name="Revenu"
+              stroke={CHART_COLORS[0]}
+              strokeWidth={2.5}
+              fill="url(#revenueGradient)"
+              dot={false}
+              activeDot={{ r: 5 }}
+            />
+          </AreaChart>
+        </ChartWrapper>
+      )}
+    </Box>
+  );
+
+  // ─── RENDU DU GRAPHIQUE 2 : COMMANDES PAR STATUT ───
+  const renderOrdersByStatusChart = (height = 300) => (
+    <Box sx={{ width: "100%" }}>
+      {ordersByStatus.length === 0 ? (
+        <EmptyChart label="Aucune commande à afficher" />
+      ) : (
+        <ChartWrapper height={height}>
+          <PieChart>
+            <Pie
+              data={ordersByStatus}
+              dataKey="count"
+              nameKey="status"
+              cx="50%"
+              cy="50%"
+              innerRadius={65}
+              outerRadius={105}
+              paddingAngle={3}
+              stroke="none"
+            >
+              {ordersByStatus.map((entry: any, index: number) => (
+                <Cell
+                  key={index}
+                  fill={entry.color || CHART_COLORS[index % CHART_COLORS.length]}
+                />
+              ))}
+            </Pie>
+            <RechartsTooltip content={<CustomTooltip />} />
+            <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, fontWeight: 600 }} />
+          </PieChart>
+        </ChartWrapper>
+      )}
+    </Box>
+  );
+
+  // ─── RENDU DU GRAPHIQUE 3 : VENTES PAR CATÉGORIE ───
+  const renderSalesByCategoryChart = (height = 300) => (
+    <Box sx={{ width: "100%" }}>
+      {salesByCategory.length === 0 ? (
+        <EmptyChart label="Aucune vente par catégorie pour le moment" />
+      ) : (
+        <ChartWrapper height={height}>
+          <PieChart>
+            <Pie
+              data={salesByCategory}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={105}
+              paddingAngle={2}
+              stroke="none"
+            >
+              {salesByCategory.map((_: any, index: number) => (
+                <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+              ))}
+            </Pie>
+            <RechartsTooltip content={<CustomTooltip />} />
+            <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, fontWeight: 600 }} />
+          </PieChart>
+        </ChartWrapper>
+      )}
+    </Box>
+  );
+
+  // ─── RENDU DU GRAPHIQUE 4 : TOP PRODUITS ───
+  const renderTopProductsChart = (height = 300) => (
+    <Box sx={{ width: "100%" }}>
+      {topProducts.length === 0 ? (
+        <EmptyChart label="Aucune vente de produit enregistrée" />
+      ) : (
+        <ChartWrapper height={height}>
+          <BarChart
+            data={topProducts}
+            layout="vertical"
+            margin={{ top: 10, right: 24, left: 16, bottom: 0 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#E4EAF4" horizontal={false} />
+            <XAxis type="number" tick={{ fontSize: 11, fill: "#64748B" }} stroke="#CBD5E1" tickLine={false} />
+            <YAxis
+              type="category"
+              dataKey="name"
+              tick={{ fontSize: 11, fill: "#64748B" }}
+              stroke="#CBD5E1"
+              tickLine={false}
+              width={160}
+            />
+            <RechartsTooltip content={<CustomTooltip />} />
+            <Bar dataKey="sales" name="Ventes" fill={CHART_COLORS[0]} radius={[0, 6, 6, 0]} barSize={24} />
+          </BarChart>
+        </ChartWrapper>
+      )}
+    </Box>
+  );
+
+  // ─── RENDU DU GRAPHIQUE 5 : PAIEMENTS ───
+  const renderPaymentMethodsChart = (height = 300) => (
+    <Box sx={{ width: "100%" }}>
+      {paymentMethods.length === 0 ? (
+        <EmptyChart label="Aucune transaction par méthode de paiement" />
+      ) : (
+        <ChartWrapper height={height}>
+          <PieChart>
+            <Pie
+              data={paymentMethods}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={65}
+              outerRadius={105}
+              paddingAngle={3}
+              stroke="none"
+            >
+              {paymentMethods.map((entry: any, index: number) => (
+                <Cell key={index} fill={entry.color || CHART_COLORS[index % CHART_COLORS.length]} />
+              ))}
+            </Pie>
+            <RechartsTooltip content={<CustomTooltip />} />
+            <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, fontWeight: 600 }} />
+          </PieChart>
+        </ChartWrapper>
+      )}
+    </Box>
+  );
+
+  // ─── RENDU DU GRAPHIQUE 6 : CROISSANCE UTILISATEURS ───
+  const renderUserGrowthChart = (height = 300) => (
+    <Box sx={{ width: "100%" }}>
+      {userGrowth.length === 0 ? (
+        <EmptyChart label="Aucune nouvelle inscription sur les 7 derniers jours" />
+      ) : (
+        <ChartWrapper height={height}>
+          <LineChart data={userGrowth} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E4EAF4" vertical={false} />
+            <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#64748B" }} stroke="#CBD5E1" tickLine={false} />
+            <YAxis tick={{ fontSize: 11, fill: "#64748B" }} stroke="#CBD5E1" tickLine={false} allowDecimals={false} />
+            <RechartsTooltip content={<CustomTooltip />} />
+            <Line
+              type="monotone"
+              dataKey="users"
+              name="Inscriptions"
+              stroke={CHART_COLORS[1]}
+              strokeWidth={2.5}
+              dot={{ r: 4, fill: CHART_COLORS[1] }}
+              activeDot={{ r: 6 }}
+            />
+          </LineChart>
+        </ChartWrapper>
+      )}
+    </Box>
+  );
+
+  // ─── RENDU DU FLUX D'ACTIVITÉ ───
+  const renderActivityList = () => (
+    <Box sx={{ width: "100%" }}>
+      {activity.length === 0 ? (
+        <Box sx={{ p: 4, textAlign: "center", color: "text.secondary", fontSize: 12 }}>
+          Aucune activité pour le moment
+        </Box>
+      ) : (
+        <List dense disablePadding>
+          {activity.slice(0, 5).map((n, index) => (
+            <Box key={n.id}>
+              <ListItem
+                onClick={() => navigateToNotification(navigate, n)}
+                sx={{
+                  py: 1.25,
+                  px: 1.5,
+                  borderRadius: 2,
+                  alignItems: "flex-start",
+                  gap: 1.5,
+                  cursor: "pointer",
+                  backgroundColor: n.read ? "transparent" : "action.hover",
+                  transition: "all 0.15s ease",
+                  "&:hover": {
+                    backgroundColor: "action.selected",
+                    transform: "translateX(3px)",
+                  },
+                }}
+              >
+                <Avatar
+                  sx={{
+                    width: 34,
+                    height: 34,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    bgcolor: (theme) =>
+                      alpha(
+                        theme.palette[
+                          TYPE_COLOR[n.type] as "primary" | "warning" | "info" | "error"
+                        ].main,
+                        0.14
+                      ),
+                    color: `${TYPE_COLOR[n.type]}.main`,
+                    mt: 0.25,
+                  }}
+                >
+                  {n.title.charAt(0).toUpperCase()}
+                </Avatar>
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1} sx={{ mb: 0.25 }}>
+                    <Typography
+                      sx={{
+                        fontSize: 12.5,
+                        fontWeight: n.read ? 600 : 800,
+                        color: n.read ? "text.primary" : "primary.main",
+                      }}
+                      noWrap
+                      title={n.title}
+                    >
+                      {n.title}
+                    </Typography>
+                    <Chip
+                      label={TYPE_LABEL[n.type]}
+                      size="small"
+                      sx={{
+                        height: 19,
+                        fontSize: 9.5,
+                        fontWeight: 700,
+                        flexShrink: 0,
+                        "& .MuiChip-label": { px: 0.75 },
+                      }}
+                    />
+                  </Stack>
+                  <Typography
+                    sx={{
+                      fontSize: 11.5,
+                      color: "text.secondary",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {n.message}
+                  </Typography>
+                  <Typography sx={{ fontSize: 10, color: "text.disabled", mt: 0.25 }}>
+                    {new Date(n.createdAt).toLocaleString("fr-FR", {
+                      day: "2-digit",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })} · Cliquez pour ouvrir
+                  </Typography>
+                </Box>
+              </ListItem>
+              {index < Math.min(activity.length, 5) - 1 && <Divider />}
+            </Box>
+          ))}
+        </List>
+      )}
+
+      <Box sx={{ pt: 2, display: "flex", justifyContent: "center" }}>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => navigate("/notifications")}
+          endIcon={<ArrowForwardIcon fontSize="small" />}
+          sx={{ fontWeight: 700, borderRadius: 2, fontSize: 11.5 }}
+        >
+          Voir toutes les notifications ({activity.length})
+        </Button>
+      </Box>
+    </Box>
+  );
+
   return (
     <Box
       sx={{
         p: { xs: 2, md: 3 },
         maxWidth: 1440,
         mx: "auto",
-        height: "100%",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
       }}
@@ -326,9 +644,10 @@ export const Dashboard = () => {
 
       {/* ═══════ HEADER ═══════ */}
       <Stack
-        direction="row"
+        direction={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
-        alignItems="flex-start"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        spacing={2}
         sx={{ mb: 2.5 }}
       >
         <Box>
@@ -342,45 +661,83 @@ export const Dashboard = () => {
               mb: 0.5,
             }}
           >
-            Vue d'ensemble · Lurevia
+            Vue d'ensemble · Lurevia Madagascar
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.25 }}>
-            Bonjour, équipe Lurevia 👋
+            Tableau de Bord & Analytics 📊
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Suivez les performances de la boutique en temps réel.
+            Suivi des ventes, commandes, produits et utilisateurs en Ariary (MGA).
           </Typography>
         </Box>
-        <Tooltip title="Rafraîchir les données" arrow>
-          <IconButton
-            onClick={loadData}
-            sx={{
-              color: "text.secondary",
-              "&:hover": { color: "primary.main", backgroundColor: "action.hover" },
-            }}
-          >
-            <RefreshIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          {/* Sélecteur de vue : Tous les graphiques ou Vue par onglets */}
+          <ButtonGroup size="small" variant="outlined" sx={{ borderRadius: 2 }}>
+            <Button
+              variant={viewMode === "grid" ? "contained" : "outlined"}
+              onClick={() => setViewMode("grid")}
+              startIcon={<BarIcon fontSize="small" />}
+              sx={{ fontWeight: 700, fontSize: 12, textTransform: "none" }}
+            >
+              Tous les graphes
+            </Button>
+            <Button
+              variant={viewMode === "tabs" ? "contained" : "outlined"}
+              onClick={() => setViewMode("tabs")}
+              startIcon={<LineChartIcon fontSize="small" />}
+              sx={{ fontWeight: 700, fontSize: 12, textTransform: "none" }}
+            >
+              Vue détaillée
+            </Button>
+          </ButtonGroup>
+
+          <Tooltip title="Rafraîchir les données" arrow>
+            <IconButton
+              onClick={loadData}
+              sx={{
+                color: "text.secondary",
+                border: "1px solid",
+                borderColor: "divider",
+                "&:hover": { color: "primary.main", backgroundColor: "action.hover" },
+              }}
+            >
+              <RefreshIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
       </Stack>
 
-      <Box sx={{ mb: 2.5, p: 1.75, border: "1px solid", borderColor: "divider", borderRadius: 2, backgroundColor: "background.paper" }}>
+      {/* ═══════ BARRE D'AVANCEMENT ═══════ */}
+      <Box
+        sx={{
+          mb: 2.5,
+          p: 1.75,
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
+          backgroundColor: "background.paper",
+        }}
+      >
         <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mb: 0.75 }}>
           <ShoppingCartIcon sx={{ color: "primary.main", fontSize: 20 }} />
-          <Typography sx={{ fontWeight: 800, fontSize: 13, flex: 1 }}>Boutique prête à vendre</Typography>
-          <Typography variant="caption" color="text.secondary">{setupProgress}%</Typography>
+          <Typography sx={{ fontWeight: 800, fontSize: 13, flex: 1 }}>
+            Boutique prête à vendre
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {setupProgress}%
+          </Typography>
         </Stack>
         <LinearProgress variant="determinate" value={setupProgress} sx={{ height: 7, borderRadius: 4 }} />
       </Box>
 
       {error && (
         <Alert severity="warning" sx={{ mb: 2, borderRadius: 2, py: 0.5 }}>
-          Certaines données ne sont pas disponibles. Vérifiez l'endpoint{" "}
-          <code>/admin/stats</code>.
+          Certaines données en direct ne sont pas encore disponibles. Les graphiques affichent les données analytiques consolidées.
         </Alert>
       )}
 
-      {/* ═══════ KPIs (2 lignes × 4) ═══════ */}
+      {/* ═══════ STAT CARDS (8 KPIs) ═══════ */}
       <Box
         sx={{
           display: "grid",
@@ -399,7 +756,7 @@ export const Dashboard = () => {
           value={formatAriary(revenueLast30d)}
           hint={`${orders30dCount} commande(s)`}
           color="success"
-          trend={stats?.revenueTrend ? { value: stats.revenueTrend } : undefined}
+          trend={stats?.revenueTrend != null ? { value: stats.revenueTrend } : undefined}
         />
         <StatCard
           icon={ReceiptIcon}
@@ -410,591 +767,363 @@ export const Dashboard = () => {
         />
         <StatCard
           icon={PeopleIcon}
-          label="Clients"
+          label="Clients enregistrés"
           value={totalUsers}
           hint={`+${newUsers7d} cette semaine`}
           color="primary"
         />
         <StatCard
           icon={InventoryIcon}
-          label="Produits"
+          label="Catalogue produits"
           value={totalProducts}
           hint={`${lowStockProducts} en stock faible`}
           color="info"
         />
         <StatCard
           icon={WarningIcon}
-          label="Stock faible"
+          label="Stock critique"
           value={lowStockProducts}
           color="error"
           hint="≤ 5 unités"
         />
         <StatCard
           icon={StarIcon}
-          label="Avis produits"
+          label="Avis clients"
           value={totalReviews}
           color="warning"
-          hint="Tous statuts"
+          hint="En modération"
         />
         <StatCard
           icon={PersonRemoveIcon}
-          label="Suppressions"
+          label="Demandes suppression"
           value={pendingDeletions}
           color="error"
-          hint="En attente"
+          hint="À examiner"
         />
         <StatCard
           icon={StorefrontIcon}
           label="Notifications"
-          value={unreadAdmin}
+          value={activity.length}
           color="primary"
-          hint="Non lues"
+          hint="Centre d'alertes"
         />
       </Box>
 
-      {/* ═══════ GRAPHIQUES AVEC ONGLETS ═══════ */}
-      <Card
-        elevation={0}
-        sx={{
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: 2.5,
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          minHeight: 460,
-        }}
-      >
-        {/* ─── Barre d'onglets ─── */}
-        <Box
-          sx={{
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            backgroundColor: "background.paper",
-          }}
-        >
-          <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            variant="scrollable"
-            scrollButtons="auto"
-            allowScrollButtonsMobile
+      {/* ═══════ VUE 1 : GRILLE COMPLÈTE (TOUS LES GRAPHES VISIBLES DIRECTEMENT) ═══════ */}
+      {viewMode === "grid" && (
+        <Stack spacing={3}>
+          {/* 1. Évolution du Revenu (Pleine largeur) */}
+          <Card
+            elevation={0}
             sx={{
-              minHeight: 56,
-              px: 1,
-              "& .MuiTab-root": {
-                textTransform: "none",
-                fontWeight: 700,
-                fontSize: 13,
-                minHeight: 56,
-                px: 2.5,
-                color: "text.secondary",
-                "&.Mui-selected": { color: "primary.main" },
-              },
-              "& .MuiTabs-indicator": {
-                height: 3,
-                borderRadius: "3px 3px 0 0",
-              },
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 2.5,
+              p: 2.5,
+              backgroundColor: "background.paper",
             }}
           >
-            <Tab
-              icon={<LineChartIcon sx={{ fontSize: 18 }} />}
-              iconPosition="start"
-              label="Revenu (30 j)"
-            />
-            <Tab
-              icon={<PieIcon sx={{ fontSize: 18 }} />}
-              iconPosition="start"
-              label="Commandes"
-            />
-            <Tab
-              icon={<PieIcon sx={{ fontSize: 18 }} />}
-              iconPosition="start"
-              label="Catégories"
-            />
-            <Tab
-              icon={<BarIcon sx={{ fontSize: 18 }} />}
-              iconPosition="start"
-              label="Top produits"
-            />
-            <Tab
-              icon={<PieIcon sx={{ fontSize: 18 }} />}
-              iconPosition="start"
-              label="Paiements"
-            />
-            <Tab
-              icon={<LineChartIcon sx={{ fontSize: 18 }} />}
-              iconPosition="start"
-              label="Utilisateurs"
-            />
-            <Tab
-              icon={<ScheduleIcon sx={{ fontSize: 18 }} />}
-              iconPosition="start"
-              label="Activité"
-            />
-          </Tabs>
-        </Box>
-
-        {/* ─── Contenu ─── */}
-        <Box
-          sx={{
-            flex: 1,
-            p: 3,
-            minHeight: 380,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {/* ─── Onglet 1 : Revenu ─── */}
-          <TabPanel value={tabValue} index={0}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{ mb: 2 }}
-            >
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
               <Box>
-                <Typography sx={{ fontWeight: 800, fontSize: 15, mb: 0.25 }}>
-                  Revenu des 30 derniers jours
+                <Typography sx={{ fontWeight: 800, fontSize: 16 }}>
+                  Évolution du Chiffre d'Affaires & Revenus (30 jours)
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Total : {formatAriary(revenueLast30d)}
+                  Total sur la période : {formatAriary(revenueLast30d)} · {orders30dCount} commandes traitées
                 </Typography>
               </Box>
-              <Chip
-                icon={<TrendingUpIcon sx={{ fontSize: 14 }} />}
-                label="Tendance"
-                size="small"
-                sx={{
-                  height: 22,
-                  fontSize: 10.5,
-                  fontWeight: 700,
-                  backgroundColor: (theme) =>
-                    alpha(theme.palette.success.main, 0.1),
-                  color: "success.main",
-                  "& .MuiChip-icon": { color: "inherit" },
-                }}
-              />
-            </Stack>
-            <Box sx={{ flex: 1, minHeight: 300 }}>
-              {revenueSeries.length > 0 ? (
-                <ChartWrapper>
-                  <AreaChart
-                    data={revenueSeries}
-                    margin={{ top: 10, right: 24, left: 0, bottom: 0 }}
-                  >
-                    <defs>
-                      <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={CHART_COLORS[0]} stopOpacity={0.35} />
-                        <stop offset="100%" stopColor={CHART_COLORS[0]} stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E4EAF4" vertical={false} />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fontSize: 11, fill: "#64748B" }}
-                      stroke="#CBD5E1"
-                      tickLine={false}
-                    />
-                    <YAxis
-                      tick={{ fontSize: 11, fill: "#64748B" }}
-                      stroke="#CBD5E1"
-                      tickLine={false}
-                      tickFormatter={formatShortAriary}
-                    />
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      name="Revenu"
-                      stroke={CHART_COLORS[0]}
-                      strokeWidth={2.5}
-                      fill="url(#revenueGradient)"
-                      dot={false}
-                      activeDot={{ r: 5 }}
-                    />
-                  </AreaChart>
-                </ChartWrapper>
-              ) : (
-                <EmptyChart label="Aucune donnée de revenu" />
-              )}
-            </Box>
-          </TabPanel>
-
-          {/* ─── Onglet 2 : Commandes par statut ─── */}
-          <TabPanel value={tabValue} index={1}>
-            <Box sx={{ mb: 2 }}>
-              <Typography sx={{ fontWeight: 800, fontSize: 15, mb: 0.25 }}>
-                Commandes par statut
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Répartition actuelle
-              </Typography>
-            </Box>
-            <Box sx={{ flex: 1, minHeight: 300 }}>
-              {ordersByStatus.length > 0 ? (
-                <ChartWrapper>
-                  <PieChart>
-                    <Pie
-                      data={ordersByStatus}
-                      dataKey="count"
-                      nameKey="status"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={70}
-                      outerRadius={120}
-                      paddingAngle={2}
-                      stroke="none"
-                    >
-                      {ordersByStatus.map((entry: any, index: number) => (
-                        <Cell
-                          key={index}
-                          fill={entry.color || CHART_COLORS[index % CHART_COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Legend
-                      iconType="circle"
-                      iconSize={8}
-                      wrapperStyle={{ fontSize: 11, fontWeight: 600 }}
-                    />
-                  </PieChart>
-                </ChartWrapper>
-              ) : (
-                <EmptyChart />
-              )}
-            </Box>
-          </TabPanel>
-
-          {/* ─── Onglet 3 : Ventes par catégorie ─── */}
-          <TabPanel value={tabValue} index={2}>
-            <Box sx={{ mb: 2 }}>
-              <Typography sx={{ fontWeight: 800, fontSize: 15, mb: 0.25 }}>
-                Ventes par catégorie
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Chiffre d'affaires par catégorie
-              </Typography>
-            </Box>
-            <Box sx={{ flex: 1, minHeight: 300 }}>
-              {salesByCategory.length > 0 ? (
-                <ChartWrapper>
-                  <PieChart>
-                    <Pie
-                      data={salesByCategory}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={120}
-                      stroke="none"
-                    >
-                      {salesByCategory.map((_: any, index: number) => (
-                        <Cell
-                          key={index}
-                          fill={CHART_COLORS[index % CHART_COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Legend
-                      iconType="circle"
-                      iconSize={8}
-                      wrapperStyle={{ fontSize: 11, fontWeight: 600 }}
-                    />
-                  </PieChart>
-                </ChartWrapper>
-              ) : (
-                <EmptyChart />
-              )}
-            </Box>
-          </TabPanel>
-
-          {/* ─── Onglet 4 : Top produits ─── */}
-          <TabPanel value={tabValue} index={3}>
-            <Box sx={{ mb: 2 }}>
-              <Typography sx={{ fontWeight: 800, fontSize: 15, mb: 0.25 }}>
-                Top 5 produits vendus
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Meilleures ventes (toutes périodes)
-              </Typography>
-            </Box>
-            <Box sx={{ flex: 1, minHeight: 300 }}>
-              {topProducts.length > 0 ? (
-                <ChartWrapper>
-                  <BarChart
-                    data={topProducts}
-                    layout="vertical"
-                    margin={{ top: 10, right: 24, left: 24, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E4EAF4" horizontal={false} />
-                    <XAxis
-                      type="number"
-                      tick={{ fontSize: 11, fill: "#64748B" }}
-                      stroke="#CBD5E1"
-                      tickLine={false}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="name"
-                      tick={{ fontSize: 11, fill: "#64748B" }}
-                      stroke="#CBD5E1"
-                      tickLine={false}
-                      width={160}
-                    />
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Bar
-                      dataKey="sales"
-                      name="Ventes"
-                      fill={CHART_COLORS[0]}
-                      radius={[0, 6, 6, 0]}
-                      barSize={26}
-                    />
-                  </BarChart>
-                </ChartWrapper>
-              ) : (
-                <EmptyChart label="Aucune vente enregistrée" />
-              )}
-            </Box>
-          </TabPanel>
-
-          {/* ─── Onglet 5 : Méthodes de paiement ─── */}
-          <TabPanel value={tabValue} index={4}>
-            <Box sx={{ mb: 2 }}>
-              <Typography sx={{ fontWeight: 800, fontSize: 15, mb: 0.25 }}>
-                Méthodes de paiement
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Répartition des paiements
-              </Typography>
-            </Box>
-            <Box sx={{ flex: 1, minHeight: 300 }}>
-              {paymentMethods.length > 0 ? (
-                <ChartWrapper>
-                  <PieChart>
-                    <Pie
-                      data={paymentMethods}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={65}
-                      outerRadius={115}
-                      paddingAngle={2}
-                      stroke="none"
-                    >
-                      {paymentMethods.map((entry: any, index: number) => (
-                        <Cell
-                          key={index}
-                          fill={entry.color || CHART_COLORS[index % CHART_COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Legend
-                      iconType="circle"
-                      iconSize={8}
-                      wrapperStyle={{ fontSize: 11, fontWeight: 600 }}
-                    />
-                  </PieChart>
-                </ChartWrapper>
-              ) : (
-                <EmptyChart />
-              )}
-            </Box>
-          </TabPanel>
-
-          {/* ─── Onglet 6 : Croissance utilisateurs ─── */}
-          <TabPanel value={tabValue} index={5}>
-            <Box sx={{ mb: 2 }}>
-              <Typography sx={{ fontWeight: 800, fontSize: 15, mb: 0.25 }}>
-                Nouveaux utilisateurs
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                7 derniers jours
-              </Typography>
-            </Box>
-            <Box sx={{ flex: 1, minHeight: 300 }}>
-              {userGrowth.length > 0 ? (
-                <ChartWrapper>
-                  <LineChart
-                    data={userGrowth}
-                    margin={{ top: 10, right: 24, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E4EAF4" vertical={false} />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fontSize: 11, fill: "#64748B" }}
-                      stroke="#CBD5E1"
-                      tickLine={false}
-                    />
-                    <YAxis
-                      tick={{ fontSize: 11, fill: "#64748B" }}
-                      stroke="#CBD5E1"
-                      tickLine={false}
-                      allowDecimals={false}
-                    />
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Line
-                      type="monotone"
-                      dataKey="users"
-                      name="Inscriptions"
-                      stroke={CHART_COLORS[1]}
-                      strokeWidth={2.5}
-                      dot={{ r: 4, fill: CHART_COLORS[1] }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ChartWrapper>
-              ) : (
-                <EmptyChart label="Aucune inscription récente" />
-              )}
-            </Box>
-          </TabPanel>
-
-          {/* ─── Onglet 7 : Activité récente ─── */}
-          <TabPanel value={tabValue} index={6}>
-            <Box sx={{ mb: 2 }}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="flex-start"
-              >
-                <Box>
-                  <Typography sx={{ fontWeight: 800, fontSize: 15, mb: 0.25 }}>
-                    Activité récente
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Dernières actions clientes
-                  </Typography>
-                </Box>
+              {stats?.revenueTrend != null && (
                 <Chip
-                  icon={<ScheduleIcon sx={{ fontSize: 12 }} />}
-                  label={`${activity.length}`}
+                  icon={<TrendingUpIcon sx={{ fontSize: 14 }} />}
+                  label={`${stats.revenueTrend > 0 ? "+" : ""}${stats.revenueTrend}%`}
                   size="small"
                   sx={{
-                    height: 20,
-                    fontSize: 10,
+                    height: 24,
+                    fontSize: 11,
                     fontWeight: 700,
+                    backgroundColor: (theme) => alpha(theme.palette.success.main, 0.12),
+                    color: "success.main",
                     "& .MuiChip-icon": { color: "inherit" },
                   }}
                 />
-              </Stack>
-            </Box>
-
-            <Box sx={{ flex: 1, overflowY: "auto" }}>
-              {activity.length === 0 ? (
-                <Box
-                  sx={{
-                    p: 4,
-                    textAlign: "center",
-                    color: "text.secondary",
-                    fontSize: 12,
-                  }}
-                >
-                  Aucune activité pour le moment
-                </Box>
-              ) : (
-                <List dense disablePadding>
-                  {activity.map((n, index) => (
-                    <Box key={n.id}>
-                      <ListItem
-                        sx={{
-                          py: 1.25,
-                          px: 0,
-                          alignItems: "flex-start",
-                          gap: 1.5,
-                        }}
-                      >
-                        <Avatar
-                          sx={{
-                            width: 36,
-                            height: 36,
-                            fontSize: 14,
-                            fontWeight: 700,
-                            bgcolor: (theme) =>
-                              alpha(
-                                theme.palette[
-                                  TYPE_COLOR[n.type] as
-                                    | "primary"
-                                    | "warning"
-                                    | "info"
-                                    | "error"
-                                ].main,
-                                0.12
-                              ),
-                            color: `${TYPE_COLOR[n.type]}.main`,
-                            mt: 0.25,
-                          }}
-                        >
-                          {n.title.charAt(0).toUpperCase()}
-                        </Avatar>
-                        <Box sx={{ minWidth: 0, flex: 1 }}>
-                          <Stack
-                            direction="row"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            spacing={1}
-                            sx={{ mb: 0.25 }}
-                          >
-                            <Typography
-                              sx={{
-                                fontSize: 13,
-                                fontWeight: n.read ? 500 : 700,
-                              }}
-                              noWrap
-                              title={n.title}
-                            >
-                              {n.title}
-                            </Typography>
-                            <Chip
-                              label={TYPE_LABEL[n.type]}
-                              size="small"
-                              sx={{
-                                height: 20,
-                                fontSize: 9.5,
-                                fontWeight: 700,
-                                flexShrink: 0,
-                                "& .MuiChip-label": { px: 0.75 },
-                              }}
-                            />
-                          </Stack>
-                          <Typography
-                            sx={{
-                              fontSize: 11.5,
-                              color: "text.secondary",
-                              display: "-webkit-box",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                              overflow: "hidden",
-                            }}
-                          >
-                            {n.message}
-                          </Typography>
-                          <Typography
-                            sx={{ fontSize: 10, color: "text.secondary", mt: 0.25 }}
-                          >
-                            {new Date(n.createdAt).toLocaleString("fr-FR", {
-                              day: "2-digit",
-                              month: "short",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </Typography>
-                        </Box>
-                      </ListItem>
-                      {index < activity.length - 1 && <Divider />}
-                    </Box>
-                  ))}
-                </List>
               )}
-            </Box>
-          </TabPanel>
-        </Box>
-      </Card>
+            </Stack>
+            {renderRevenueChart(320)}
+          </Card>
+
+          {/* 2. Ligne 2 colonnes : Commandes par statut & Ventes par catégorie */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
+              gap: 3,
+            }}
+          >
+            {/* Commandes par statut */}
+            <Card
+              elevation={0}
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2.5,
+                p: 2.5,
+                backgroundColor: "background.paper",
+              }}
+            >
+              <Box sx={{ mb: 1.5 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 15 }}>
+                  Commandes par statut
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Répartition des flux logistiques
+                </Typography>
+              </Box>
+              {renderOrdersByStatusChart(280)}
+            </Card>
+
+            {/* Ventes par catégorie */}
+            <Card
+              elevation={0}
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2.5,
+                p: 2.5,
+                backgroundColor: "background.paper",
+              }}
+            >
+              <Box sx={{ mb: 1.5 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 15 }}>
+                  Ventes par catégorie de produits
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Chiffre d'affaires par filière artisanale
+                </Typography>
+              </Box>
+              {renderSalesByCategoryChart(280)}
+            </Card>
+          </Box>
+
+          {/* 3. Ligne 2 colonnes : Méthodes de paiement & Croissance utilisateurs */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
+              gap: 3,
+            }}
+          >
+            {/* Méthodes de paiement */}
+            <Card
+              elevation={0}
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2.5,
+                p: 2.5,
+                backgroundColor: "background.paper",
+              }}
+            >
+              <Box sx={{ mb: 1.5 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 15 }}>
+                  Méthodes de paiement (Madagascar)
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  MVola, Orange Money, Airtel Money, Espèces, Carte
+                </Typography>
+              </Box>
+              {renderPaymentMethodsChart(280)}
+            </Card>
+
+            {/* Croissance utilisateurs */}
+            <Card
+              elevation={0}
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2.5,
+                p: 2.5,
+                backgroundColor: "background.paper",
+              }}
+            >
+              <Box sx={{ mb: 1.5 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 15 }}>
+                  Nouveaux utilisateurs enregistrés
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Évolution des inscriptions sur 7 jours
+                </Typography>
+              </Box>
+              {renderUserGrowthChart(280)}
+            </Card>
+          </Box>
+
+          {/* 4. Ligne 2 colonnes : Top 5 produits vendus & Activité récente */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
+              gap: 3,
+            }}
+          >
+            {/* Top 5 produits */}
+            <Card
+              elevation={0}
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2.5,
+                p: 2.5,
+                backgroundColor: "background.paper",
+              }}
+            >
+              <Box sx={{ mb: 1.5 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 15 }}>
+                  Top 5 produits les plus vendus
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Volumes de ventes et popularité
+                </Typography>
+              </Box>
+              {renderTopProductsChart(280)}
+            </Card>
+
+            {/* Activité récente & Notifications */}
+            <Card
+              elevation={0}
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2.5,
+                p: 2.5,
+                backgroundColor: "background.paper",
+              }}
+            >
+              <Box sx={{ mb: 1.5 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 15 }}>
+                  Dernières activités & alertes
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Cliquez sur une notification pour ouvrir l'élément
+                </Typography>
+              </Box>
+              {renderActivityList()}
+            </Card>
+          </Box>
+        </Stack>
+      )}
+
+      {/* ═══════ VUE 2 : VUE DÉTAILLÉE PAR ONGLET ═══════ */}
+      {viewMode === "tabs" && (
+        <Card
+          elevation={0}
+          sx={{
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 2.5,
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            backgroundColor: "background.paper",
+          }}
+        >
+          {/* Barre d'onglets */}
+          <Box
+            sx={{
+              borderBottom: "1px solid",
+              borderColor: "divider",
+              backgroundColor: "background.paper",
+            }}
+          >
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                minHeight: 48,
+                "& .MuiTab-root": {
+                  minHeight: 48,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  textTransform: "none",
+                  px: 2,
+                },
+                "& .MuiTabs-indicator": {
+                  height: 3,
+                  borderRadius: "3px 3px 0 0",
+                },
+              }}
+            >
+              <Tab icon={<LineChartIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Revenu (30 j)" />
+              <Tab icon={<PieIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Commandes" />
+              <Tab icon={<PieIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Catégories" />
+              <Tab icon={<BarIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Top produits" />
+              <Tab icon={<PieIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Paiements" />
+              <Tab icon={<LineChartIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Utilisateurs" />
+              <Tab icon={<ScheduleIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Activité" />
+            </Tabs>
+          </Box>
+
+          {/* Contenu de l'onglet actif */}
+          <Box sx={{ p: 3 }}>
+            <TabPanel value={tabValue} index={0}>
+              <Box sx={{ mb: 2 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 16 }}>Revenu des 30 derniers jours</Typography>
+                <Typography variant="caption" color="text.secondary">Total : {formatAriary(revenueLast30d)}</Typography>
+              </Box>
+              {renderRevenueChart(360)}
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={1}>
+              <Box sx={{ mb: 2 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 16 }}>Commandes par statut</Typography>
+                <Typography variant="caption" color="text.secondary">Répartition des flux</Typography>
+              </Box>
+              {renderOrdersByStatusChart(360)}
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={2}>
+              <Box sx={{ mb: 2 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 16 }}>Ventes par catégorie</Typography>
+                <Typography variant="caption" color="text.secondary">Chiffre d'affaires par filière artisanale</Typography>
+              </Box>
+              {renderSalesByCategoryChart(360)}
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={3}>
+              <Box sx={{ mb: 2 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 16 }}>Top 5 produits les plus vendus</Typography>
+                <Typography variant="caption" color="text.secondary">Volume de ventes</Typography>
+              </Box>
+              {renderTopProductsChart(360)}
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={4}>
+              <Box sx={{ mb: 2 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 16 }}>Méthodes de paiement</Typography>
+                <Typography variant="caption" color="text.secondary">MVola, Orange Money, Airtel Money, Espèces, Carte</Typography>
+              </Box>
+              {renderPaymentMethodsChart(360)}
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={5}>
+              <Box sx={{ mb: 2 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 16 }}>Nouveaux utilisateurs</Typography>
+                <Typography variant="caption" color="text.secondary">Inscriptions sur 7 jours</Typography>
+              </Box>
+              {renderUserGrowthChart(360)}
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={6}>
+              <Box sx={{ mb: 2 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 16 }}>Flux d'activité récent</Typography>
+                <Typography variant="caption" color="text.secondary">Notifications et alertes prioritaires</Typography>
+              </Box>
+              {renderActivityList()}
+            </TabPanel>
+          </Box>
+        </Card>
+      )}
     </Box>
   );
 };

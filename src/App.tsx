@@ -55,6 +55,7 @@ import {
   VerificationListPage,
 } from "./adminPages";
 import { SitePagesPage } from "./pages/SitePagesPage";
+import { NotificationsPage } from "./pages/NotificationsPage";
 
 const InventoryIcon = normalizeMuiIcon(InventoryIconModule);
 const CategoryIcon = normalizeMuiIcon(CategoryIconModule);
@@ -81,6 +82,10 @@ const queryClient = new QueryClient({
       staleTime: 20_000,
       cacheTime: 300_000,
       refetchOnWindowFocus: false,
+      retry: (failureCount, error: any) => {
+        if (error?.status === 401 || error?.status === 403) return false;
+        return failureCount < 2;
+      },
     },
   },
 });
@@ -146,6 +151,7 @@ const ThemedAdmin = () => {
       <Resource name="transfers" list={TransfersPage} icon={SwapHorizIcon} options={{ label: "Transferts" }} />
       <Resource name="pages" list={SitePagesPage} icon={ArticleIcon} options={{ label: "Pages du site" }} />
       <CustomRoutes>
+        <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/verifications" element={<VerificationListPage />} />
         <Route path="/messages" element={<AdminMessage />} />
         <Route path="/admins/create" element={<AdminCreatePage />} />
