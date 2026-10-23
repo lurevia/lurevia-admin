@@ -244,7 +244,7 @@ export const ProfilePage = () => {
                                 />
                             </Stack>
                             <Typography variant="body2" color="text.secondary">
-                                {identity?.email ?? "admin@lurevia.mg"}
+                                {identity?.email ?? "—"}
                             </Typography>
                             <Typography sx={{ fontSize: 11, color: "text.secondary", mt: 0.5 }}>
                                 Dernière connexion :{" "}

@@ -2,8 +2,13 @@ import { fetchUtils, HttpError } from "react-admin";
 
 const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
 
+const defaultApiUrl =
+  typeof window !== "undefined" && window.location.hostname.includes("github.io")
+    ? "https://lurevia-ecommerce.onrender.com/api/v1"
+    : "/api/v1";
+
 export const API_URL = (
-  configuredApiUrl || "/api/v1"
+  configuredApiUrl || defaultApiUrl
 ).replace(/\/+$/, "");
 const ACCESS_TOKEN_KEY = "lurevia_admin_access_token";
 const USER_KEY = "lurevia_admin_user";

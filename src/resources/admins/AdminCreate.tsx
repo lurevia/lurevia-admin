@@ -61,7 +61,7 @@ export const AdminCreate = () => {
   } = useAdminCreateForm();
 
   const previewName = values.fullName.trim() || "Nom complet";
-  const previewEmail = values.email.trim() || "email@lurevia.mg";
+  const previewEmail = values.email.trim() || "admin@exemple.com";
   const previewInitial = values.fullName.trim().charAt(0).toUpperCase() || "A";
 
   return (

@@ -106,6 +106,11 @@ export const dataProvider: DataProvider = {
 
     // Filtre spécifique selon la ressource
     if (resource === "users") {
+      if (filters.search || filters.q) {
+        const queryStr = String(filters.search || filters.q).trim();
+        apiQueryObj.q = queryStr;
+        apiQueryObj.search = queryStr;
+      }
       if (filters.role) apiQueryObj.role = filters.role;
       if (params.sort?.field) {
         apiQueryObj.sortField = params.sort.field;
@@ -162,9 +167,11 @@ export const dataProvider: DataProvider = {
       items = items.filter((item) => {
         const title = String(item.title || item.name || item.fullName || item.sellerName || item.orderNumber || "").toLowerCase();
         const email = String(item.email || item.userEmail || "").toLowerCase();
+        const phone = String(item.phone || "").toLowerCase();
+        const id = String(item.id || "").toLowerCase();
         const sku = String(item.sku || "").toLowerCase();
         const desc = String(item.description || item.comment || "").toLowerCase();
-        return title.includes(searchQuery) || email.includes(searchQuery) || sku.includes(searchQuery) || desc.includes(searchQuery);
+        return title.includes(searchQuery) || email.includes(searchQuery) || phone.includes(searchQuery) || id.includes(searchQuery) || sku.includes(searchQuery) || desc.includes(searchQuery);
       });
     }
 

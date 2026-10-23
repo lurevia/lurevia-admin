@@ -39,6 +39,7 @@ import {
 } from "../adminActions";
 import { normalizeMuiIcon } from "../muiIcon";
 import { SettingsInput } from "../components/SettingsInput";
+import lureviaLogo from "../logo";
 
 const SaveIcon = normalizeMuiIcon(SaveIconModule);
 const RefreshIcon = normalizeMuiIcon(RefreshIconModule);
@@ -431,7 +432,7 @@ export const SettingsPage = () => {
               <Stack direction={{ xs: "column", sm: "row" }} spacing={3} alignItems="flex-start">
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <Avatar
-                    src={getValue("logoUrl") || undefined}
+                    src={getValue("logoUrl") || lureviaLogo}
                     variant="rounded"
                     sx={{
                       width: 80,

@@ -18,6 +18,8 @@ import {
 } from "@mui/material";
 import { normalizeMuiIcon } from "../muiIcon";
 import { loginTheme } from "../theme/loginTheme";
+import lureviaLogo from "../logo";
+import loginIllustration from "../assets/login-illustration.png";
 
 const VisibilityIcon = normalizeMuiIcon(VisibilityIconModule);
 const VisibilityOffIcon = normalizeMuiIcon(VisibilityOffIconModule);
@@ -105,88 +107,25 @@ export const LureviaLoginPage = () => {
             <Box
               sx={{
                 alignSelf: "center",
-                position: "relative",
-                width: 320,
-                height: 320,
+                width: "100%",
+                maxWidth: 380,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
+                my: "auto",
+                py: 2,
               }}
             >
               <Box
-                sx={{
-                  position: "absolute",
-                  width: 240,
-                  height: 240,
-                  bgcolor: "#FADCD9",
-                  borderRadius: "40% 60% 60% 40% / 40% 40% 60% 60%",
-                  opacity: 0.7,
-                }}
-              />
-
-              <Box
                 component="img"
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop"
-                alt="Lurevia"
+                src={loginIllustration}
+                alt="Illustration Connexion Lurevia"
                 sx={{
-                  width: 190,
-                  height: 190,
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  zIndex: 2,
-                  border: "4px solid #FFFFFF",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
-                }}
-              />
-
-              <Box
-                component="img"
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
-                alt=""
-                sx={{
-                  position: "absolute",
-                  top: 40,
-                  right: 20,
-                  width: 48,
-                  height: 48,
-                  borderRadius: "50%",
-                  border: "3px solid #FFFFFF",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  zIndex: 3,
-                }}
-              />
-
-              <Box
-                component="img"
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
-                alt=""
-                sx={{
-                  position: "absolute",
-                  bottom: 60,
-                  right: 10,
-                  width: 44,
-                  height: 44,
-                  borderRadius: "50%",
-                  border: "3px solid #FFFFFF",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  zIndex: 3,
-                }}
-              />
-
-              <Box
-                component="img"
-                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop"
-                alt=""
-                sx={{
-                  position: "absolute",
-                  bottom: 50,
-                  left: 20,
-                  width: 52,
-                  height: 52,
-                  borderRadius: "50%",
-                  border: "3px solid #FFFFFF",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  zIndex: 3,
+                  width: "100%",
+                  maxHeight: 350,
+                  objectFit: "contain",
+                  filter: "drop-shadow(0 12px 24px rgba(10, 27, 61, 0.08))",
                 }}
               />
             </Box>
@@ -205,17 +144,43 @@ export const LureviaLoginPage = () => {
               justifyContent: "center",
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", mb: 5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
               <Box
                 component="img"
-                src="/logo.svg"
+                src={lureviaLogo}
                 alt="Lurevia"
                 sx={{
-                  height: 40,
-                  width: "auto",
-                  objectFit: "contain",
+                  height: 52,
+                  width: 52,
+                  borderRadius: 2,
+                  objectFit: "cover",
+                  boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
                 }}
               />
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: "1.35rem",
+                    fontWeight: 800,
+                    color: "#0A1B3D",
+                    lineHeight: 1.15,
+                    letterSpacing: "-0.3px",
+                  }}
+                >
+                  Lurevia
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    color: "text.secondary",
+                    letterSpacing: 1.5,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Be Authentic · Admin
+                </Typography>
+              </Box>
             </Box>
 
             {/* Titres */}

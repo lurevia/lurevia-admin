@@ -3,14 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/admin-favicon.svg" />
+    <link rel="icon" href="./admin-favicon.ico" />
     <title>Lurevia — Espace Admin</title>
     <meta name="description" content="Espace d'administration pour la plateforme Lurevia" />
     <meta property="og:title" content="Lurevia — Espace Admin" />
     <meta property="og:description" content="Espace d'administration pour la plateforme Lurevia" />
+    <meta property="og:image" content="./logo.jpg" />
+    <script>
+      // Single Page Apps for GitHub Pages
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&');
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location));
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="src/main.tsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -60,6 +60,7 @@ import ArrowForwardIconModule from "@mui/icons-material/ArrowForward";
 
 import { normalizeMuiIcon } from "../muiIcon";
 import { StatCard } from "./StatCard";
+import lureviaLogo from "../logo";
 import {
   fetchAdminNotifications,
   fetchStats,
@@ -650,26 +651,43 @@ export const Dashboard = () => {
         spacing={2}
         sx={{ mb: 2.5 }}
       >
-        <Box>
-          <Typography
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Box
+            component="img"
+            src={lureviaLogo}
+            alt="Lurevia"
             sx={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              color: "primary.main",
-              letterSpacing: 2,
-              textTransform: "uppercase",
-              mb: 0.5,
+              width: 52,
+              height: 52,
+              borderRadius: 2,
+              objectFit: "cover",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+              border: "1px solid",
+              borderColor: "divider",
+              display: { xs: "none", sm: "block" },
             }}
-          >
-            Vue d'ensemble · Lurevia Madagascar
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.25 }}>
-            Tableau de Bord & Analytics 📊
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Suivi des ventes, commandes, produits et utilisateurs en Ariary (MGA).
-          </Typography>
-        </Box>
+          />
+          <Box>
+            <Typography
+              sx={{
+                fontSize: 10.5,
+                fontWeight: 700,
+                color: "primary.main",
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                mb: 0.5,
+              }}
+            >
+              Vue d'ensemble · Lurevia Madagascar
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.25 }}>
+              Tableau de Bord & Analytics 📊
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Suivi des ventes, commandes, produits et utilisateurs en Ariary (MGA).
+            </Typography>
+          </Box>
+        </Stack>
 
         <Stack direction="row" spacing={1.5} alignItems="center">
           {/* Sélecteur de vue : Tous les graphiques ou Vue par onglets */}

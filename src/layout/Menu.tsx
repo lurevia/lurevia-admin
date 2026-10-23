@@ -35,6 +35,7 @@ import SettingsIconModule from "@mui/icons-material/Settings";
 import NotificationsIconModule from "@mui/icons-material/Notifications";
 import type { SvgIconComponent } from "@mui/icons-material";
 import { normalizeMuiIcon } from "../muiIcon";
+import lureviaLogo from "../logo";
 
 // ─── Icônes normalisées (obligatoire pour éviter React error #130) ───
 const ExpandMoreIcon = normalizeMuiIcon(ExpandMoreIconModule);
@@ -284,17 +285,43 @@ export const LureviaMenu = () => {
     <MenuContainer>
       {/* ═══════ HEADER : Logo + Nom ═══════ */}
       <MenuHeader>
-        <LogoBox>L</LogoBox>
-        <Typography
+        <Box
+          component="img"
+          src={lureviaLogo}
+          alt="Lurevia"
           sx={{
-            fontWeight: 800,
-            fontSize: 15,
-            color: "text.primary",
-            letterSpacing: "-0.3px",
+            width: 36,
+            height: 36,
+            borderRadius: 1.5,
+            objectFit: "cover",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+            flexShrink: 0,
           }}
-        >
-          Lurevia
-        </Typography>
+        />
+        <Box sx={{ minWidth: 0 }}>
+          <Typography
+            sx={{
+              fontWeight: 800,
+              fontSize: 15,
+              color: "text.primary",
+              letterSpacing: "-0.3px",
+              lineHeight: 1.2,
+            }}
+          >
+            Lurevia
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: 9.5,
+              fontWeight: 600,
+              color: "text.secondary",
+              letterSpacing: 0.8,
+              textTransform: "uppercase",
+            }}
+          >
+            Administration
+          </Typography>
+        </Box>
       </MenuHeader>
 
       {/* Section active */}

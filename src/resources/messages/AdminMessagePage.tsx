@@ -10,6 +10,7 @@ import {
   CardContent,
   Checkbox,
   Chip,
+  CircularProgress,
   Divider,
   FormControlLabel,
   IconButton,
@@ -56,6 +57,7 @@ type Customer = {
   id: string;
   fullName?: string;
   email?: string;
+  phone?: string;
   avatarUrl?: string;
   isVerified?: boolean;
   role?: string;
@@ -205,9 +207,18 @@ const CustomerOption = ({ customer }: { customer: Customer }) => {
           sx={{ fontSize: 11, color: "text.secondary", lineHeight: 1.3 }}
           noWrap
         >
-          {customer.email || "—"}
+          {customer.email || "Sans email"}
+          {customer.phone ? ` • ${customer.phone}` : ""}
         </Typography>
       </Box>
+      {customer.role && customer.role !== "CUSTOMER" && (
+        <Chip
+          label={customer.role === "SELLER" ? "Vendeur" : customer.role === "ADMIN" ? "Admin" : customer.role}
+          size="small"
+          variant="outlined"
+          sx={{ height: 20, fontSize: 10, fontWeight: 700, flexShrink: 0 }}
+        />
+      )}
     </Stack>
   );
 };
@@ -505,7 +516,9 @@ export const AdminMessagePage = () => {
   const notify = useNotify();
 
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [loadingCustomers, setLoadingCustomers] = useState(true);
+  const [totalCustomersCount, setTotalCustomersCount] = useState<number>(0);
+  const [loadingCustomers, setLoadingCustomers] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
   const [allUsers, setAllUsers] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [subject, setSubject] = useState("");
@@ -513,23 +526,79 @@ export const AdminMessagePage = () => {
   const [sending, setSending] = useState(false);
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
 
+  // Charger le premier lot de clients et le nombre total au montage
   useEffect(() => {
+    let isMounted = true;
+    setLoadingCustomers(true);
     provider
       .getList("users", {
         pagination: { page: 1, perPage: 100 },
         sort: { field: "fullName", order: "ASC" },
         filter: {},
       })
-      .then(({ data }) => {
+      .then(({ data, total }) => {
+        if (!isMounted) return;
         setCustomers(data as Customer[]);
+        if (typeof total === "number") {
+          setTotalCustomersCount(total);
+        }
       })
       .catch(() => {
+        if (!isMounted) return;
         notify("Impossible de charger les clients.", { type: "error" });
       })
       .finally(() => {
-        setLoadingCustomers(false);
+        if (isMounted) setLoadingCustomers(false);
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, [provider, notify]);
+
+  // Recherche dynamique avec debouncing de 300ms vers le backend
+  useEffect(() => {
+    const trimmed = searchInput.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setLoadingCustomers(true);
+      provider
+        .getList("users", {
+          pagination: { page: 1, perPage: 100 },
+          sort: { field: "fullName", order: "ASC" },
+          filter: { q: trimmed, search: trimmed },
+        })
+        .then(({ data }) => {
+          setCustomers((prev) => {
+            // Fusionner les nouveaux résultats avec les précédents pour ne jamais perdre le client sélectionné
+            const map = new Map<string, Customer>();
+            if (selectedCustomer) {
+              map.set(String(selectedCustomer.id), selectedCustomer);
+            }
+            (data as Customer[]).forEach((item) => {
+              map.set(String(item.id), item);
+            });
+            prev.forEach((item) => {
+              if (!map.has(String(item.id))) {
+                map.set(String(item.id), item);
+              }
+            });
+            return Array.from(map.values());
+          });
+        })
+        .catch(() => {
+          // Erreur silencieuse pour ne pas perturber la saisie
+        })
+        .finally(() => {
+          setLoadingCustomers(false);
+        });
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchInput, provider, selectedCustomer]);
 
   const applyTemplate = (template: SubjectTemplate) => {
     setSubject(template.subject);
@@ -658,19 +727,44 @@ export const AdminMessagePage = () => {
             <Autocomplete
               value={selectedCustomer}
               onChange={(_, newValue) => setSelectedCustomer(newValue)}
+              inputValue={searchInput}
+              onInputChange={(_, newInputValue, reason) => {
+                if (reason === "input" || reason === "clear") {
+                  setSearchInput(newInputValue);
+                }
+              }}
               options={customers}
-              getOptionLabel={(option) =>
-                option.fullName || option.email || "Utilisateur"
-              }
-              isOptionEqualToValue={(option, value) => option.id === value.id}
+              getOptionLabel={(option) => {
+                if (typeof option === "string") return option;
+                if (option.fullName && option.email) return `${option.fullName} (${option.email})`;
+                return option.fullName || option.email || option.phone || "Utilisateur";
+              }}
+              isOptionEqualToValue={(option, value) => String(option.id) === String(value.id)}
+              filterOptions={(options, state) => {
+                const q = state.inputValue.trim().toLowerCase();
+                if (!q) return options;
+                return options.filter((u) => {
+                  const name = (u.fullName || "").toLowerCase();
+                  const email = (u.email || "").toLowerCase();
+                  const phone = (u.phone || "").toLowerCase();
+                  const id = String(u.id || "").toLowerCase();
+                  return name.includes(q) || email.includes(q) || phone.includes(q) || id.includes(q);
+                });
+              }}
               loading={loadingCustomers}
-              noOptionsText="Aucun client trouvé"
+              noOptionsText={
+                loadingCustomers
+                  ? "Recherche des clients en cours…"
+                  : searchInput.trim()
+                  ? `Aucun client trouvé pour « ${searchInput} »`
+                  : "Aucun client disponible"
+              }
               size="small"
               sx={{ mb: 3 }}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  placeholder="Rechercher un client par nom ou email…"
+                  placeholder="Rechercher par nom, prénom, email ou téléphone…"
                   InputProps={{
                     ...params.InputProps,
                     startAdornment: (
@@ -683,6 +777,14 @@ export const AdminMessagePage = () => {
                         {params.InputProps.startAdornment}
                       </>
                     ),
+                    endAdornment: (
+                      <>
+                        {loadingCustomers ? (
+                          <CircularProgress color="inherit" size={18} sx={{ mr: 1 }} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
                   }}
                 />
               )}
@@ -690,6 +792,7 @@ export const AdminMessagePage = () => {
                 <Box
                   component="li"
                   {...props}
+                  key={option.id}
                   sx={{
                     display: "flex !important",
                     alignItems: "center",
@@ -737,8 +840,8 @@ export const AdminMessagePage = () => {
                   fontWeight: 600,
                 }}
               >
-                Le message sera envoyé à <strong>{customers.length}</strong> client
-                {customers.length > 1 ? "s" : ""}. Cette action ne peut pas être
+                Le message sera envoyé à <strong>{totalCustomersCount || customers.length}</strong> client
+                {(totalCustomersCount || customers.length) > 1 ? "s" : ""}. Cette action ne peut pas être
                 annulée.
               </Typography>
             </Box>
@@ -985,9 +1088,10 @@ export const AdminMessagePage = () => {
                   Destinataire :{" "}
                   <strong>
                     {allUsers
-                      ? `Tous les clients (${customers.length})`
-                      : selectedCustomer?.fullName ||
-                      selectedCustomer?.email ||
+                      ? `Tous les clients (${totalCustomersCount || customers.length})`
+                      : selectedCustomer?.fullName
+                      ? `${selectedCustomer.fullName} (${selectedCustomer.email || selectedCustomer.phone || "sans email"})`
+                      : selectedCustomer?.email ||
                       "Non sélectionné"}
                   </strong>
                 </Typography>
