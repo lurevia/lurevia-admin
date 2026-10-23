@@ -18,7 +18,11 @@ import {
   type SitePageInput,
   type SitePageRecord,
 } from "../adminActions";
+import AddIconModule from "@mui/icons-material/Add";
+import { normalizeMuiIcon } from "../muiIcon";
 import { SitePageEditor } from "./SitePageEditor";
+
+const AddIcon = normalizeMuiIcon(AddIconModule);
 
 const EMPTY_PAGE: SitePageInput = {
   slug: "",
@@ -147,26 +151,54 @@ export const SitePagesPage = () => {
             <CardContent>
               <Stack spacing={1}>
                 <Button
-                  variant="contained"
+                  variant={selectedId === null ? "contained" : "outlined"}
                   onClick={() => {
                     setSelectedId(null);
                     setForm(EMPTY_PAGE);
                   }}
+                  startIcon={<AddIcon />}
+                  sx={{ mb: 1, fontWeight: 700 }}
                 >
                   Créer une page
                 </Button>
                 {loading ? (
                   <CircularProgress size={24} sx={{ alignSelf: "center", m: 2 }} />
+                ) : pages.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary" sx={{ p: 1, textAlign: "center" }}>
+                    Aucune page créée pour le moment.
+                  </Typography>
                 ) : (
                   pages.map((page) => (
                     <Button
                       key={page.id}
-                      variant={selectedId === page.id ? "outlined" : "text"}
+                      variant={selectedId === page.id ? "contained" : "text"}
+                      color={selectedId === page.id ? "primary" : "inherit"}
                       onClick={() => editPage(page)}
-                      sx={{ justifyContent: "flex-start", textAlign: "left" }}
+                      sx={{
+                        justifyContent: "space-between",
+                        textAlign: "left",
+                        px: 1.5,
+                        py: 0.85,
+                        borderRadius: 1,
+                        textTransform: "none",
+                        fontWeight: selectedId === page.id ? 700 : 500,
+                        backgroundColor: selectedId === page.id ? undefined : "transparent",
+                      }}
                     >
-                      {page.title}
-                      {!page.published && " (brouillon)"}
+                      <Typography variant="body2" noWrap sx={{ maxWidth: 170, fontWeight: "inherit" }}>
+                        {page.title || page.slug || "Sans titre"}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontSize: 10.5,
+                          fontWeight: 600,
+                          opacity: 0.75,
+                          ml: 1,
+                        }}
+                      >
+                        {page.published ? "En ligne" : "Brouillon"}
+                      </Typography>
                     </Button>
                   ))
                 )}

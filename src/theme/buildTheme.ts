@@ -208,7 +208,33 @@ export function buildTheme(config: ThemeConfig): RaThemeOptions {
                 },
             },
 
-            MuiTextField: { defaultProps: { size: "small" } },
+            MuiTextField: {
+                defaultProps: {
+                    variant: "outlined",
+                    size: "small",
+                },
+            },
+
+            MuiFormControl: {
+                defaultProps: {
+                    variant: "outlined",
+                    size: "small",
+                },
+            },
+
+            MuiOutlinedInput: {
+                styleOverrides: {
+                    root: {
+                        borderRadius,
+                    },
+                },
+            },
+
+            MuiInputLabel: {
+                defaultProps: {
+                    size: "small",
+                },
+            },
 
             ...(raOverrides as any),
         },
